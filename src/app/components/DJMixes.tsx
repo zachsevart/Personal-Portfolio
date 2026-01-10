@@ -1,6 +1,5 @@
 import { AudioPlayer } from './AudioPlayer';
 import { getAudioUrl } from '../../config/audio-urls';
-
 export function DJMixes() {
   const mixes = [
     {
