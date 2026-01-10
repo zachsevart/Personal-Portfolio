@@ -1,0 +1,13 @@
+# Exclude large audio files from Vercel deployment
+# These should be hosted on Vercel Blob Storage or external CDN
+public/audio/**/*.wav
+public/audio/**/*.mp3
+public/audio/**/*.m4a
+public/audio/**/*.cue
+
+# Development files
+.env.local
+.env*.local
+node_modules
+dist
+build

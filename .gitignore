@@ -1,0 +1,20 @@
+node_modules
+dist
+build
+.DS_Store
+*.log
+.env
+.env.local
+.env.*.local
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.env*.local
+
+# Large audio files - should be in Vercel Blob Storage or external CDN
+public/audio/**/*.wav
+public/audio/**/*.mp3
+public/audio/**/*.m4a
+public/audio/**/*.cue
