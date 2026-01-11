@@ -50,42 +50,44 @@ export function Landing() {
             </Link>
           </div>
 
-          <div className="flex gap-6 items-center pt-8 border-t border-white/30">
-            <span className="text-sm text-white/70">Connect:</span>
-            <a 
-              href="https://github.com/zachsevart" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white hover:opacity-60 transition-opacity"
-              aria-label="GitHub"
-            >
-              <Github size={24} />
-            </a>
-            <a 
-              href="https://linkedin.com/in/zachsevart/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white hover:opacity-60 transition-opacity"
-              aria-label="LinkedIn"
-            >
-              <Linkedin size={24} />
-            </a>
-            <a 
-              href="https://soundcloud.com/user-170634185" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white hover:opacity-60 transition-opacity"
-              aria-label="SoundCloud"
-            >
-              <Music size={24} />
-            </a>
-            <a 
-              href="mailto:zachsevart@ku.edu" 
-              className="text-white hover:opacity-60 transition-opacity"
-              aria-label="Email"
-            >
-              <Mail size={24} />
-            </a>
+          <div className="pt-8 mt-8 border-t border-white/30">
+            <h2 className="text-xl mb-4 text-white drop-shadow-md">Connect</h2>
+            <div className="space-y-3">
+              <a 
+                href="https://github.com/zachsevart" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
+              >
+                <Github size={20} />
+                <span>GitHub</span>
+              </a>
+              <a 
+                href="https://linkedin.com/in/zachsevart/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
+              >
+                <Linkedin size={20} />
+                <span>LinkedIn</span>
+              </a>
+              <a 
+                href="https://soundcloud.com/user-170634185" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
+              >
+                <Music size={20} />
+                <span>SoundCloud</span>
+              </a>
+              <a 
+                href="mailto:zachsevart@ku.edu" 
+                className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
+              >
+                <Mail size={20} />
+                <span>zachsevart@ku.edu</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
