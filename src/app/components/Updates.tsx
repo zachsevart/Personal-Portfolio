@@ -5,10 +5,10 @@ export function Updates() {
   const updates = [
     {
       id: 1,
-      date: "2025-01-10",
-      category: "sourdough",
-      title: "Scored a new pattern today",
-      content: "Finally nailed the leaf pattern I've been practicing. 78% hydration, 24hr cold proof. Crumb was open and airy. Keeping this formula."
+      date: "2025-12-15",
+      category: "programming",
+      title: "New App initialization",
+      content: "Over my final winter break at KU, I started a new app with friends to integrate Seattle's food and drink scene into a single app through Yelp's Places and Reviews API, Youtube's video API, and simple card swiping to save places, or skip places.."
     },
     {
       id: 2,
