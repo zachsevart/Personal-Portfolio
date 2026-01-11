@@ -55,6 +55,7 @@ export function DJMixes() {
           const audioUrl = getAudioUrl(mix.audioFile);
           
           return (
+            <div className="bg-black/20 rounded-lg p-4"> 
             <article key={mix.id} className="border-b border-white/30 pb-8">
               <div className="flex justify-between items-baseline mb-2">
                 <h2 className="text-2xl text-white drop-shadow-md">{mix.title}</h2>
@@ -65,6 +66,7 @@ export function DJMixes() {
               
               <AudioPlayer title={mix.title} audioUrl={audioUrl} />
             </article>
+            </div>
           );
         })}
       </div>
