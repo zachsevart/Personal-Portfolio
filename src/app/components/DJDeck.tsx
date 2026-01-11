@@ -1,7 +1,7 @@
 // @ts-nocheck - TypeScript types for React Three Fiber should work after restarting TS server
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, RoundedBox } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, RoundedBox, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Rotating turntable platter
@@ -88,69 +88,29 @@ function Fader({ position }: { position: [number, number, number] }) {
   );
 }
 
-// Main deck structure
+// GLTF Model component - replace '/models/your-deck.gltf' with your actual model path
+function DeckModel({ modelPath, scale = 1 }: { modelPath: string; scale?: number }) {
+  const { scene } = useGLTF(modelPath);
+  
+  // Clone the scene to avoid issues with multiple instances
+  return (
+    <group scale={scale}>
+      <primitive object={scene.clone()} />
+    </group>
+  );
+}
+
+// Main deck structure - now uses GLTF model
 function Deck() {
+  // Pioneer DJ Console GLTF model
+  const modelPath = '/pioneer_dj_console/scene.gltf';
+  
   return (
     <group>
-      {/* Main deck body */}
-      <RoundedBox
-        position={[0, -0.5, 0]}
-        args={[7.05, 3.9525, 0.7275]}
-        radius={0.15}
-        smoothness={4}
-      >
-        <meshStandardMaterial color="#808080" metalness={0.1} roughness={0.8} />
-      </RoundedBox>
+      {/* GLTF Model - adjust scale here to make model smaller/larger */}
+      <DeckModel modelPath={modelPath} scale={0.1} />
 
-      {/* Turntable well/recess */}
-      <mesh position={[0, -0.3, 0]}>
-        <boxGeometry args={[2.5, 0.2, 2.5]} />
-        <meshStandardMaterial color="#050505" />
-      </mesh>
-
-      {/* Turntable */}
-      <Turntable rotationSpeed={0.5} />
-
-      {/* Control panel */}
-      <mesh position={[2.5, 0, -0.5]}>
-        <boxGeometry args={[1, 0.3, 2]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.2} />
-      </mesh>
-
-      {/* Knobs on control panel */}
-      <Knob position={[2.5, 0.2, -0.2]} color="#ff3333" />
-      <Knob position={[2.5, 0.2, 0]} color="#33ff33" />
-      <Knob position={[2.5, 0.2, 0.2]} color="#3333ff" />
-      <Knob position={[2.5, 0.2, 0.4]} />
-
-      {/* Faders */}
-      <Fader position={[3.5, 0.1, -0.5]} />
-      <Fader position={[3.5, 0.1, 0]} />
-      <Fader position={[3.5, 0.1, 0.5]} />
-
-      {/* Cue/Play buttons */}
-      <mesh position={[2.5, 0.15, -0.7]}>
-        <boxGeometry args={[0.2, 0.05, 0.2]} />
-        <meshStandardMaterial color="#ff0000" />
-      </mesh>
-      <mesh position={[2.5, 0.15, -0.9]}>
-        <boxGeometry args={[0.2, 0.05, 0.2]} />
-        <meshStandardMaterial color="#00ff00" />
-      </mesh>
-
-      {/* Tone arm */}
-      <group position={[-1.5, 0.5, 0]}>
-        <mesh rotation={[0, 0, Math.PI / 6]}>
-          <boxGeometry args={[1.5, 0.05, 0.05]} />
-          <meshStandardMaterial color="#333" metalness={0.8} />
-        </mesh>
-        <mesh position={[-0.75, 0, 0]}>
-          <boxGeometry args={[0.1, 0.2, 0.1]} />
-          <meshStandardMaterial color="#555" metalness={0.7} />
-        </mesh>
-      </group>
-
-      {/* Lighting */}
+      {/* Lighting - keep these for better model visibility */}
       <pointLight position={[5, 5, 5]} intensity={1} />
       <pointLight position={[-5, 5, -5]} intensity={0.5} />
       <ambientLight intensity={0.4} />

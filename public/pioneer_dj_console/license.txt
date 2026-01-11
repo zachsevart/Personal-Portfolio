@@ -1,0 +1,11 @@
+Model Information:
+* title:	Pioneer DJ console
+* source:	https://sketchfab.com/3d-models/pioneer-dj-console-0ba527fa6b164c34aa050dcecbaa2ffb
+* author:	TwoPixels Studio (https://sketchfab.com/twopixels.studio)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Pioneer DJ console" (https://sketchfab.com/3d-models/pioneer-dj-console-0ba527fa6b164c34aa050dcecbaa2ffb) by TwoPixels Studio (https://sketchfab.com/twopixels.studio) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
