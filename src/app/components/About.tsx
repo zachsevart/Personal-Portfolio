@@ -8,35 +8,61 @@ export function About() {
       className="min-h-[calc(100vh-200px)] w-full py-12"
       interactive={true}
       colors={activeColors2}
+      backgroundGradient="from-gray-900 to-slate-900"
     >
-      <div className="max-w-4xl mx-auto px-6 relative z-10">
-      <div className="max-w-2xl">
+      <div className="max-w-5xl mx-auto px-6 relative z-10">
         <h1 className="text-3xl mb-8 text-white drop-shadow-lg">About</h1>
         
-        <div className="space-y-6 leading-relaxed">
-          <p className="text-white/90 text-xl">
-            I'm a computer science student with a passion for creating things, whether that's 
-            software, music, or a sourdough loaf. I still have yet to make the perfect loaf.
-          </p>
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+          {/* Text Section - 2xl width (672px) */}
+          <div className="w-full md:w-[672px] flex-shrink-0">
+            <div className="space-y-6 leading-relaxed">
+              <p className="text-white/90 text-xl">
+                I'm a computer science student with a passion for creating things, whether that's 
+                software, music, or a sourdough loaf. I still have yet to make the perfect loaf.
+              </p>
+              
+              <p className="text-white/90 text-xl">
+                By day, I'm building my SeattleSweet App with friends, while developing my skills as a software engineer. 
+                By night (or day, whenever i feel like it), I'm on my DDJ FLX-10 mixing techno and house, 
+                or learning about music production on Ableton Live 12.
+              </p>
+
+              <p className="text-white/90 text-xl">
+                This site is a simple space to share my DJ mixes and document my various projects. 
+                I plan on being experimental with the design of the site. The focus is on user experience to showcase my projects and interests, but also to test new software or UI. 
+              </p>
+            </div>
+          </div>
           
-          <p className="text-white/90 text-xl">
-            By day, I'm building my SeattleSweet App with friends, while developing my skills as a software engineer. 
-            By night (or day, whenever i feel like it), I'm on my DDJ FLX-10 mixing techno and house, 
-            or learning about music production on Ableton Live 12.
-          </p>
-
-          <p className="text-white/90 text-xl">
-            This site is a simple space to share my DJ mixes and document my various projects. 
-            It's intentionally visually experimental, with a focus on user experience to showcase my projects and interests. 
-          </p>
+          {/* Image Section - 2xl width (672px) */}
+          <div className="w-full md:w-[672px] flex-shrink-0">
+            <img 
+              src="/images/IMG_5695.jpg" 
+              alt="Profile" 
+              className="w-1/2 h-auto object-cover rounded-lg drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+            />
+          </div>
         </div>
-
+        
+        {/* Low opacity white rounded rectangle separator */}
+        
+        
         {/* Education Section */}
         <div className="pt-12 mt-12 border-t border-white/30">
           <h2 className="text-2xl mb-6 text-white drop-shadow-md">Education</h2>
           <div className="flex flex-col md:flex-row gap-6 md:gap-8 leading-relaxed">
             <div className="flex-1">
-              <h3 className="text-xl mb-2 text-white drop-shadow-sm">The University of Kansas</h3>
+              <h3 className="text-xl mb-2 text-white drop-shadow-sm">
+                <a 
+                  href="https://www.ku.edu/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white hover:opacity-60 transition-opacity"
+                >
+                  The University of Kansas
+                </a>
+              </h3>
               <p className="text-sm text-white/70">Lawrence, Kansas</p>
               <br />
               <p className="text-white/90 text-xl mb-1">Computer Science</p>
@@ -58,7 +84,16 @@ export function About() {
               </ul>
             </div>
             <div className="flex-1">
-              <h3 className="text-xl mb-2 text-white drop-shadow-sm">The University of Newcastle</h3>
+              <h3 className="text-xl mb-2 text-white drop-shadow-sm">
+                <a 
+                  href="https://www.newcastle.edu.au/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white hover:opacity-60 transition-opacity"
+                >
+                  The University of Newcastle
+                </a>
+              </h3>
               <p className="text-sm text-white/70">Newcastle, Australia</p>
               <br />
               <p className="text-white/90 text-xl mb-1">Computer Science (Study Abroad Program)</p>
@@ -79,19 +114,46 @@ export function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 leading-relaxed">
             <div>
               <h3 className="text-xl mb-2 text-white drop-shadow-sm">Data Analytics Intern</h3>
-              <p className="text-white/90 text-xl mb-1">Olson Kundig</p>
+              <p className="text-white/90 text-xl mb-1">
+                <a 
+                  href="https://olsonkundig.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white hover:opacity-60 transition-opacity"
+                >
+                  Olson Kundig
+                </a>
+              </p>
               <p className="text-sm text-white/70 mb-2">Summer 2025</p>
               <p className="text-white/90 text-xl">Job description and responsibilities</p>
             </div>
             <div>
               <h3 className="text-xl mb-2 text-white drop-shadow-sm">IT Intern</h3>
-              <p className="text-white/90 text-xl mb-1">Space Needle</p>
+              <p className="text-white/90 text-xl mb-1">
+                <a 
+                  href="https://www.spaceneedle.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white hover:opacity-60 transition-opacity"
+                >
+                  Space Needle
+                </a>
+              </p>
               <p className="text-sm text-white/70 mb-2">Summer 2024</p>
               <p className="text-white/90 text-xl">Job description and responsibilities</p>
             </div>
             <div>
               <h3 className="text-xl mb-2 text-white drop-shadow-sm">Admissions Team Member</h3>
-              <p className="text-white/90 text-xl mb-1">Space Needle</p>
+              <p className="text-white/90 text-xl mb-1">
+                <a 
+                  href="https://www.spaceneedle.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white hover:opacity-60 transition-opacity"
+                >
+                  Space Needle
+                </a>
+              </p>
               <p className="text-sm text-white/70 mb-2">July 2020 - July 2023</p>
               <p className="text-white/90 text-xl">Job description and responsibilities</p>
             </div>
@@ -130,15 +192,14 @@ export function About() {
                 <span>SoundCloud</span>
               </a>
               <a 
-                href="mailto:your.email@example.com" 
+                href="mailto:zachsevart@ku.edu" 
                 className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
               >
                 <Mail size={20} />
-                <span>your.email@example.com</span>
+                <span>zachsevart@ku.edu</span>
               </a>
             </div>
           </div>
-        </div>
       </div>
     </BubbleBackground>
   );
