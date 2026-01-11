@@ -104,16 +104,34 @@ function DeckModel({ modelPath, scale = 1 }: { modelPath: string; scale?: number
 function Deck() {
   // Pioneer DJ Console GLTF model
   const modelPath = '/pioneer_dj_console/scene.gltf';
+  const groupRef = useRef<THREE.Group>(null);
+  
+  // Animate rotation back and forth
+  useFrame((_state, delta) => {
+    if (groupRef.current) {
+      // Use sine wave for smooth back-and-forth rotation
+      // Adjust 0.3 for rotation speed, 0.5 for rotation range (in radians)
+      groupRef.current.rotation.y = Math.sin(_state.clock.elapsedTime * 0.3) * 0.5;
+    }
+  });
   
   return (
-    <group>
-      {/* GLTF Model - adjust scale here to make model smaller/larger */}
-      <DeckModel modelPath={modelPath} scale={0.1} />
+    <group ref={groupRef}>
+      {/* Background circle - white with 30% opacity */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
+        <circleGeometry args={[4.8, 32]} />
+        <meshStandardMaterial color="#ffffff" opacity={0.3} transparent />
+      </mesh>
 
-      {/* Lighting - keep these for better model visibility */}
-      <pointLight position={[5, 5, 5]} intensity={1} />
-      <pointLight position={[-5, 5, -5]} intensity={0.5} />
-      <ambientLight intensity={0.4} />
+      {/* GLTF Model - adjust scale here to make model smaller/larger */}
+      <DeckModel modelPath={modelPath} scale={0.10} />
+
+      {/* Enhanced lighting for better model visibility */}
+      <pointLight position={[5, 5, 5]} intensity={1.5} />
+      <pointLight position={[-5, 5, -5]} intensity={1} />
+      <pointLight position={[0, 5, 0]} intensity={1} />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[10, 10, 5]} intensity={0.5} />
     </group>
   );
 }
@@ -121,9 +139,9 @@ function Deck() {
 // Main component - smaller, inline version
 export function DJDeck() {
   return (
-    <div className="w-[300px] h-[300px] md:w-[400px] md:h-[400px]">
+    <div className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] xl:w-[600px] xl:h-[600px]">
       <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[6, 5, 6]} fov={50} />
+        <PerspectiveCamera makeDefault position={[6, 5, 6]} fov={60} />
         <OrbitControls
           enablePan={false}
           enableZoom={false}

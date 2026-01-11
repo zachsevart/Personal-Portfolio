@@ -21,6 +21,7 @@ type BubbleBackgroundProps = React.ComponentProps<'div'> & {
   interactive?: boolean;
   transition?: SpringOptions;
   colors?: BubbleColors;
+  backgroundGradient?: string;
 };
 
 function BubbleBackground({
@@ -37,6 +38,7 @@ function BubbleBackground({
     fifth: '180,180,50',
     sixth: '140,100,255',
   },
+  backgroundGradient = 'from-violet-900 to-blue-900',
   ...props
 }: BubbleBackgroundProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -106,7 +108,8 @@ function BubbleBackground({
       ref={containerRef}
       data-slot="bubble-background"
       className={cn(
-        'relative size-full overflow-hidden bg-gradient-to-br from-violet-900 to-blue-900',
+        'relative size-full overflow-hidden bg-gradient-to-br',
+        backgroundGradient,
         className,
       )}
       {...props}

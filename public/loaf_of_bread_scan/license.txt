@@ -1,0 +1,11 @@
+Model Information:
+* title:	Loaf of Bread Scan
+* source:	https://sketchfab.com/3d-models/loaf-of-bread-scan-af71d7fe4b87409f8d9b81452fcb9847
+* author:	Max Funkner (https://sketchfab.com/MaxFunkner)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Loaf of Bread Scan" (https://sketchfab.com/3d-models/loaf-of-bread-scan-af71d7fe4b87409f8d9b81452fcb9847) by Max Funkner (https://sketchfab.com/MaxFunkner) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

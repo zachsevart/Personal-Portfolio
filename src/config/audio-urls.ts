@@ -10,6 +10,7 @@
 export const audioUrlMap: Record<string, string> = {
   // Map your audio file paths to Vercel Blob URLs
   'halloween/01 Halloween_1outof4.wav': 'https://yfpfs8e2jwrpj9bm.public.blob.vercel-storage.com/01%20Halloween_1outof4.wav',
+  'mixes/01 mix006.wav': 'https://yfpfs8e2jwrpj9bm.public.blob.vercel-storage.com/01%20mix006.wav',
   // Example:
   // 'mixes/01 mix004.wav': 'https://[your-store].public.blob.vercel-storage.com/audio/mixes/01%20mix004.wav',
 };
@@ -30,5 +31,9 @@ export function getAudioUrl(localPath: string): string {
   }
   
   // Fallback to local path (for development)
-  return localPath.startsWith('/') ? localPath : `/${localPath}`;
+  // Ensure path starts with /audio/ for proper routing
+  if (localPath.startsWith('/')) {
+    return localPath.startsWith('/audio/') ? localPath : `/audio${localPath}`;
+  }
+  return `/audio/${localPath}`;
 }

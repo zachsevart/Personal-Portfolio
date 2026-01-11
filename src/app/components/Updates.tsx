@@ -1,3 +1,6 @@
+import { BubbleBackground } from '@/components/animate-ui/components/backgrounds/bubble';
+import { activeColors3 } from '@/config/bubble-colors';
+
 export function Updates() {
   const updates = [
     {
@@ -45,27 +48,34 @@ export function Updates() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-6">
-      <div className="mb-8">
-        <p className="opacity-60">
-          A running log of bread bakes and programming experiments
-        </p>
-      </div>
+    <BubbleBackground 
+      className="min-h-[calc(100vh-200px)] w-full py-12"
+      interactive={true}
+      colors={activeColors3}
+      backgroundGradient="from-gray-900 to-slate-900"
+    >
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
+        <div className="mb-8">
+          <p className="text-white/70">
+            A running log of bread bakes and programming experiments
+          </p>
+        </div>
 
-      <div className="space-y-8">
-        {updates.map((update) => (
-          <article key={update.id} className="border-b border-black pb-8">
-            <div className="flex gap-4 items-baseline mb-2">
-              <span className="text-sm opacity-60">{update.date}</span>
-              <span className="text-xs px-2 py-1 border border-black">
-                {update.category}
-              </span>
-            </div>
-            <h2 className="text-xl mb-3">{update.title}</h2>
-            <p className="leading-relaxed">{update.content}</p>
-          </article>
-        ))}
+        <div className="space-y-8">
+          {updates.map((update) => (
+            <article key={update.id} className="border-b border-white/30 pb-8">
+              <div className="flex gap-4 items-baseline mb-2">
+                <span className="text-sm text-white/70">{update.date}</span>
+                <span className="text-xs px-2 py-1 border border-white/50 text-white/90">
+                  {update.category}
+                </span>
+              </div>
+              <h2 className="text-xl mb-3 text-white drop-shadow-md">{update.title}</h2>
+              <p className="leading-relaxed text-white/90">{update.content}</p>
+            </article>
+          ))}
+        </div>
       </div>
-    </div>
+    </BubbleBackground>
   );
 }

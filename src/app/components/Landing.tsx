@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { Github, Linkedin, Mail, Music } from 'lucide-react';
 import { BubbleBackground } from '@/components/animate-ui/components/backgrounds/bubble';
 import { DJDeck } from './DJDeck';
+import { activeColors } from '@/config/bubble-colors';
 
 export function Landing() {
   return (
     <BubbleBackground 
       className="min-h-[calc(100vh-200px)] w-full"
       interactive={true}
+      colors={activeColors}
     >
       <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         <div className="min-h-[70vh] flex flex-col justify-center">
@@ -23,16 +25,14 @@ export function Landing() {
           <div className="text-xl md:text-2xl lg:text-3xl space-y-6 mb-12 max-w-3xl leading-relaxed text-white/90 drop-shadow-md">
             <p>
               Computer Science @ The University of Kansas <br />
-              DJ and Producer
+              DJ and Producer in training
             </p>
           </div>
           <div className="text-lg md:text-xl lg:text-2xl space-y-6 mb-12 max-w-3xl leading-relaxed text-white/80 drop-shadow-md">
             <p>
-              Building software by day, mixing techno by night, and baking sourdough whenever I have time.
-            </p>
-            <p>
               This is where I share my music, document my projects, and keep track of things I'm learning.
             </p>
+            <p>For more information, check out the <Link to="/about" className="text-white hover:opacity-60 transition-opacity">about</Link> page.</p>
           </div>
 
           <div className="flex flex-wrap gap-6 mb-12">
@@ -53,7 +53,7 @@ export function Landing() {
           <div className="flex gap-6 items-center pt-8 border-t border-white/30">
             <span className="text-sm text-white/70">Connect:</span>
             <a 
-              href="https://github.com/yourusername" 
+              href="https://github.com/zachsevart" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-white hover:opacity-60 transition-opacity"
@@ -62,7 +62,7 @@ export function Landing() {
               <Github size={24} />
             </a>
             <a 
-              href="https://linkedin.com/in/yourusername" 
+              href="https://linkedin.com/in/zachsevart/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-white hover:opacity-60 transition-opacity"
@@ -71,7 +71,7 @@ export function Landing() {
               <Linkedin size={24} />
             </a>
             <a 
-              href="https://soundcloud.com/yourusername" 
+              href="https://soundcloud.com/user-170634185" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-white hover:opacity-60 transition-opacity"
@@ -80,7 +80,7 @@ export function Landing() {
               <Music size={24} />
             </a>
             <a 
-              href="mailto:your.email@example.com" 
+              href="mailto:zachsevart@ku.edu" 
               className="text-white hover:opacity-60 transition-opacity"
               aria-label="Email"
             >

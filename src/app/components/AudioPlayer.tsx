@@ -72,20 +72,20 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
   const waveform = generateWaveform();
 
   return (
-    <div className="border border-black p-4">
+    <div className="border border-white/30 p-4">
       <audio ref={audioRef} src={audioUrl} />
       
       <div className="flex items-center gap-4 mb-4">
         <button
           onClick={togglePlay}
-          className="w-12 h-12 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors flex-shrink-0"
+          className="w-12 h-12 border border-white/50 flex items-center justify-center hover:bg-white hover:text-black text-white transition-colors flex-shrink-0"
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <Pause size={20} /> : <Play size={20} />}
         </button>
         <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">{title}</div>
-          <div className="text-sm opacity-60">
+          <div className="font-medium truncate text-white">{title}</div>
+          <div className="text-sm text-white/70">
             {formatTime(currentTime)} / {formatTime(duration)}
           </div>
         </div>
@@ -100,7 +100,7 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
           <div
             key={i}
             className={`flex-1 transition-colors ${
-              bar.isPassed ? 'bg-black' : 'bg-gray-300'
+              bar.isPassed ? 'bg-white' : 'bg-white/30'
             }`}
             style={{ height: `${bar.height}%` }}
           />
@@ -108,9 +108,9 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
       </div>
 
       {/* Progress bar underneath */}
-      <div className="mt-2 h-1 bg-gray-300 cursor-pointer" onClick={handleProgressClick}>
+      <div className="mt-2 h-1 bg-white/30 cursor-pointer" onClick={handleProgressClick}>
         <div 
-          className="h-full bg-black transition-all"
+          className="h-full bg-white transition-all"
           style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
         />
       </div>
