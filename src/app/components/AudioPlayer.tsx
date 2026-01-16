@@ -10,26 +10,89 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Debug: Log the audio URL being used
+  useEffect(() => {
+    console.log(`[AudioPlayer] Loading audio for "${title}":`, audioUrl);
+    console.log(`[AudioPlayer] Test this URL in browser:`, audioUrl);
+    
+    // Validate URL format
+    try {
+      new URL(audioUrl);
+      console.log(`[AudioPlayer] ✓ URL is valid`);
+    } catch (e) {
+      console.error(`[AudioPlayer] ✗ Invalid URL format:`, e);
+    }
+  }, [audioUrl, title]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
+    const updateDuration = () => {
+      setDuration(audio.duration);
+      setIsLoading(false);
+    };
     const handleEnded = () => setIsPlaying(false);
+    
+    const handleError = (e: Event) => {
+      setIsLoading(false);
+      const audioElement = e.target as HTMLAudioElement;
+      let errorMessage = 'Failed to load audio';
+      
+      if (audioElement.error) {
+        switch (audioElement.error.code) {
+          case MediaError.MEDIA_ERR_ABORTED:
+            errorMessage = 'Audio loading aborted';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            errorMessage = 'Network error - check CORS or URL';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            errorMessage = 'Audio decode error';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            errorMessage = 'Audio format not supported';
+            break;
+          default:
+            errorMessage = `Audio error: ${audioElement.error.message || 'Unknown error'}`;
+        }
+      }
+      
+      setError(errorMessage);
+      console.error(`[AudioPlayer] Error loading "${title}":`, errorMessage, audioUrl, audioElement.error);
+    };
+
+    const handleLoadStart = () => {
+      setIsLoading(true);
+      setError(null);
+    };
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+      setError(null);
+    };
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
     };
-  }, []);
+  }, [audioUrl, title]);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -75,10 +138,33 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
     <div className="border border-white/30 p-4">
       <audio ref={audioRef} src={audioUrl} />
       
+      {/* Error message */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded text-red-200 text-sm">
+          <strong>Error:</strong> {error}
+          <div className="mt-2 text-xs opacity-75 break-all">
+            URL: {audioUrl}
+          </div>
+        </div>
+      )}
+      
+      {/* Loading indicator */}
+      {isLoading && !error && (
+        <div className="mb-4 text-sm text-white/70">Loading audio...</div>
+      )}
+      
+      {/* Debug info (only in development) */}
+      {import.meta.env.DEV && (
+        <div className="mb-2 text-xs text-white/50 break-all font-mono">
+          Debug URL: {audioUrl}
+        </div>
+      )}
+      
       <div className="flex items-center gap-4 mb-4">
         <button
           onClick={togglePlay}
-          className="w-12 h-12 border border-white/50 flex items-center justify-center hover:bg-white hover:text-black text-white transition-colors flex-shrink-0"
+          disabled={!!error || isLoading}
+          className="w-12 h-12 border border-white/50 flex items-center justify-center hover:bg-white hover:text-black text-white transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <Pause size={20} /> : <Play size={20} />}

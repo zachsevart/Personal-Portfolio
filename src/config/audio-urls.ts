@@ -71,22 +71,37 @@ export function getAudioUrl(localPath: string): string {
     .replace(/^\/?public\/?/, '')
     .replace(/^audio\//, '');
   
+  // Debug logging (enable in production too for troubleshooting)
+  console.log('[getAudioUrl] Input path:', localPath);
+  console.log('[getAudioUrl] Clean path:', cleanPath);
+  console.log('[getAudioUrl] S3 Config:', {
+    enabled: S3_CONFIG.enabled,
+    baseUrl: S3_CONFIG.baseUrl,
+    prefix: S3_CONFIG.prefix,
+    bucketName: S3_CONFIG.bucketName,
+  });
+  
   // 1. Check direct URL mappings first (highest priority)
   if (audioUrlMap[cleanPath]) {
-    return audioUrlMap[cleanPath];
+    const url = audioUrlMap[cleanPath];
+    console.log('[getAudioUrl] Using direct mapping:', url);
+    return url;
   }
   
   // 2. Generate S3 URL if enabled
   if (S3_CONFIG.enabled) {
     const s3Url = getS3Url(localPath);
     if (s3Url) {
+      console.log('[getAudioUrl] Generated S3 URL:', s3Url);
       return s3Url;
     }
   }
   
   // 3. Fallback to local path (for development)
-  if (localPath.startsWith('/')) {
-    return localPath.startsWith('/audio/') ? localPath : `/audio${localPath}`;
-  }
-  return `/audio/${localPath}`;
+  const fallbackUrl = localPath.startsWith('/') 
+    ? (localPath.startsWith('/audio/') ? localPath : `/audio${localPath}`)
+    : `/audio/${localPath}`;
+  
+  console.log('[getAudioUrl] Using fallback URL:', fallbackUrl);
+  return fallbackUrl;
 }
