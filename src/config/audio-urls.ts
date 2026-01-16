@@ -27,10 +27,13 @@ const S3_CONFIG = {
 };
 
 // Direct URL mappings (for files with custom URLs or Vercel Blob)
+// These take priority over S3 URL generation
+// Using direct CloudFront URLs as fallback until env vars are set in Vercel
 export const audioUrlMap: Record<string, string> = {
-  // Map your audio file paths to direct URLs
-  // 'halloween/01 Halloween_1outof4.wav': 'https://your-custom-url.com/audio/halloween/01%20Halloween_1outof4.wav',
-  // ' mixes/01 mix006.wav': 'https://your-custom-url.com/audio/ mixes/01%20mix006.wav',
+  'halloween/01 Halloween_1outof4.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/halloween/01%20Halloween_1outof4.wav',
+  ' mixes/01 mix006.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/ mixes/01%20mix006.wav',
+  'Unknown Album(2)/01 mix007.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/Unknown%20Album(2)/01%20mix007.wav',
+  'Unknown Album(4)/01 mix009.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/Unknown%20Album(4)/01%20mix009.wav',
 };
 
 /**
