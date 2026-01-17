@@ -14,7 +14,7 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Debug: Log the audio URL being used
+  // Debug: Log the audio URL being used and check Content-Type
   useEffect(() => {
     console.log(`[AudioPlayer] Loading audio for "${title}":`, audioUrl);
     console.log(`[AudioPlayer] Test this URL in browser:`, audioUrl);
@@ -23,6 +23,57 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
     try {
       new URL(audioUrl);
       console.log(`[AudioPlayer] ✓ URL is valid`);
+      
+      // Check Content-Type header and response details
+      fetch(audioUrl, { method: 'HEAD' })
+        .then(response => {
+          const contentType = response.headers.get('content-type');
+          const contentLength = response.headers.get('content-length');
+          const cacheControl = response.headers.get('cache-control');
+          
+          console.log(`[AudioPlayer] Response Headers:`, {
+            'Content-Type': contentType,
+            'Content-Length': contentLength,
+            'Cache-Control': cacheControl,
+            'Status': response.status,
+            'Status Text': response.statusText
+          });
+          
+          if (!contentType || !contentType.includes('audio')) {
+            console.error(`[AudioPlayer] ⚠️ WARNING: Content-Type is "${contentType}" but should be "audio/wav"`);
+            console.error(`[AudioPlayer] CloudFront may not be forwarding the Content-Type from S3!`);
+            console.error(`[AudioPlayer] Fix: Configure CloudFront to forward Content-Type header`);
+          } else {
+            console.log(`[AudioPlayer] ✓ Content-Type looks correct: ${contentType}`);
+          }
+          
+          // Also check if file exists and is accessible
+          if (response.status !== 200) {
+            console.error(`[AudioPlayer] ⚠️ File returned status ${response.status}: ${response.statusText}`);
+          }
+        })
+        .catch(err => {
+          console.error(`[AudioPlayer] Could not check headers:`, err);
+        });
+      
+      // Also try to load the audio and check for codec issues
+      const testAudio = new Audio();
+      testAudio.addEventListener('error', (e) => {
+        const audioEl = e.target as HTMLAudioElement;
+        if (audioEl.error) {
+          console.error(`[AudioPlayer] Audio element error:`, {
+            code: audioEl.error.code,
+            message: audioEl.error.message,
+            note: 'Code 4 = MEDIA_ERR_SRC_NOT_SUPPORTED (format/codec issue)'
+          });
+          console.error(`[AudioPlayer] This might mean:`);
+          console.error(`[AudioPlayer] 1. WAV codec is not supported by browser (try converting to MP3)`);
+          console.error(`[AudioPlayer] 2. File is corrupted`);
+          console.error(`[AudioPlayer] 3. Content-Type header not being forwarded by CloudFront`);
+        }
+      }, { once: true });
+      
+      testAudio.src = audioUrl;
     } catch (e) {
       console.error(`[AudioPlayer] ✗ Invalid URL format:`, e);
     }
@@ -136,7 +187,7 @@ export function AudioPlayer({ title, audioUrl }: AudioPlayerProps) {
 
   return (
     <div className="border border-white/30 p-4">
-      <audio ref={audioRef} src={audioUrl} />
+      <audio ref={audioRef} src={audioUrl} crossOrigin="anonymous" preload="metadata" />
       
       {/* Error message */}
       {error && (
