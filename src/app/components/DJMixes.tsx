@@ -12,7 +12,7 @@ export function DJMixes() {
       duration: "55 min",
       description: "A mix of Deep house and pop remixes so that the people dont get upset",
       // This will use blob URL if available, otherwise fallback to local path
-      audioFile: "halloween/01 Halloween_1outof4.wav"
+      audioFile: "01 Halloween_1outof4.wav"
     },
     {
       id: 2,
@@ -20,7 +20,7 @@ export function DJMixes() {
       date: "2024-12-15",
       duration: "40 min",
       description: "Some deep cuts and other stuff i liked",
-      audioFile: " mixes/01 mix006.wav" // Note: folder name has leading space
+      audioFile: "01 mix006.wav"
     },
     {
       id: 3,
@@ -28,7 +28,7 @@ export function DJMixes() {
       date: "2025-05-22",
       duration: "44 min",
       description: "Random deep cuts i liked",
-      audioFile: "Unknown Album(2)/01 mix007.wav" // Update this path to match your actual file
+      audioFile: "01 mix007.wav"
     },
     {
       id: 4,
@@ -36,7 +36,7 @@ export function DJMixes() {
       date: "2024-04-29",
       duration: "32 min",
       description: "Peak time tech recorded at Lass O'Gowrie open decks",
-      audioFile: "Unknown Album(4)/01 mix009.wav" // Update this path to match your actual file
+      audioFile: "01 mix009.wav"
     }
   ];
 

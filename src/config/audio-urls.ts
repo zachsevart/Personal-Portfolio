@@ -7,39 +7,46 @@
  * - Direct URL mappings
  */
 
-// S3 Configuration
-// Option 1: Use CloudFront CDN (recommended for better performance)
-const S3_CONFIG = {
-  // Set this to your CloudFront distribution URL (e.g., 'https://d1234567890.cloudfront.net')
-  // OR use direct S3 bucket URL (e.g., 'https://your-bucket.s3.region.amazonaws.com')
-  baseUrl: import.meta.env.VITE_S3_BASE_URL || '',
-  
-  // If using S3 directly, specify bucket name and region
-  // If using CloudFront, leave these empty
+// Public audio configuration (Cloudflare R2, S3, or CDN)
+// Option 1: Use a public CDN/custom domain (recommended)
+const PUBLIC_AUDIO_CONFIG = {
+  // Set this to your public R2/custom domain or CDN URL
+  // Examples:
+  // - 'https://media.yourdomain.com'
+  // - 'https://<account>.r2.cloudflarestorage.com/<bucket>'
+  baseUrl:
+    import.meta.env.VITE_PUBLIC_AUDIO_BASE_URL ||
+    import.meta.env.VITE_S3_BASE_URL ||
+    '',
+
+  // Optional: If generating S3-style URLs directly
   bucketName: import.meta.env.VITE_S3_BUCKET_NAME || '',
   region: import.meta.env.VITE_S3_REGION || 'us-east-1',
-  
-  // Prefix path in S3 bucket (e.g., 'audio' if files are in s3://bucket/audio/)
-  prefix: import.meta.env.VITE_S3_PREFIX || 'audio',
-  
-  // Enable S3 URL generation
-  enabled: import.meta.env.VITE_USE_S3 === 'true' || false,
+
+  // Prefix path in storage (e.g., 'audio' if files are under /audio/)
+  prefix:
+    import.meta.env.VITE_PUBLIC_AUDIO_PREFIX ||
+    import.meta.env.VITE_S3_PREFIX ||
+    '',
+
+  // Enable public URL generation
+  enabled:
+    import.meta.env.VITE_PUBLIC_AUDIO_ENABLED === 'true' ||
+    import.meta.env.VITE_USE_S3 === 'true' ||
+    false,
 };
 
 // Direct URL mappings (for files with custom URLs or Vercel Blob)
 // These take priority over S3 URL generation
 // Using direct CloudFront URLs as fallback until env vars are set in Vercel
 export const audioUrlMap: Record<string, string> = {
-  'halloween/01 Halloween_1outof4.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/halloween/01%20Halloween_1outof4.wav',
-  ' mixes/01 mix006.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/ mixes/01%20mix006.wav',
-  'Unknown Album(2)/01 mix007.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/Unknown%20Album(2)/01%20mix007.wav',
-  'Unknown Album(4)/01 mix009.wav': 'https://dibqjqvon2mzi.cloudfront.net/audio/Unknown%20Album(4)/01%20mix009.wav',
+  // Keep empty unless you need per-file overrides.
 };
 
 /**
- * Generate S3 URL for an audio file
+ * Generate public URL for an audio file
  */
-function getS3Url(localPath: string): string {
+function getPublicUrl(localPath: string): string {
   // Remove leading slash or 'public/' prefix
   const cleanPath = localPath
     .replace(/^\/?public\/?/, '')
@@ -51,15 +58,15 @@ function getS3Url(localPath: string): string {
     .map(segment => encodeURIComponent(segment))
     .join('/');
   
-  if (S3_CONFIG.baseUrl) {
-    // Use CloudFront or direct S3 URL
-    const base = S3_CONFIG.baseUrl.replace(/\/$/, ''); // Remove trailing slash
-    const prefix = S3_CONFIG.prefix ? `${S3_CONFIG.prefix}/` : '';
+  if (PUBLIC_AUDIO_CONFIG.baseUrl) {
+    // Use public CDN/custom domain or direct R2/S3 URL
+    const base = PUBLIC_AUDIO_CONFIG.baseUrl.replace(/\/$/, ''); // Remove trailing slash
+    const prefix = PUBLIC_AUDIO_CONFIG.prefix ? `${PUBLIC_AUDIO_CONFIG.prefix}/` : '';
     return `${base}/${prefix}${encodedPath}`;
-  } else if (S3_CONFIG.bucketName) {
+  } else if (PUBLIC_AUDIO_CONFIG.bucketName) {
     // Generate S3 URL from bucket name and region
-    const prefix = S3_CONFIG.prefix ? `${S3_CONFIG.prefix}/` : '';
-    return `https://${S3_CONFIG.bucketName}.s3.${S3_CONFIG.region}.amazonaws.com/${prefix}${encodedPath}`;
+    const prefix = PUBLIC_AUDIO_CONFIG.prefix ? `${PUBLIC_AUDIO_CONFIG.prefix}/` : '';
+    return `https://${PUBLIC_AUDIO_CONFIG.bucketName}.s3.${PUBLIC_AUDIO_CONFIG.region}.amazonaws.com/${prefix}${encodedPath}`;
   }
   
   return '';
@@ -77,11 +84,11 @@ export function getAudioUrl(localPath: string): string {
   // Debug logging (enable in production too for troubleshooting)
   console.log('[getAudioUrl] Input path:', localPath);
   console.log('[getAudioUrl] Clean path:', cleanPath);
-  console.log('[getAudioUrl] S3 Config:', {
-    enabled: S3_CONFIG.enabled,
-    baseUrl: S3_CONFIG.baseUrl,
-    prefix: S3_CONFIG.prefix,
-    bucketName: S3_CONFIG.bucketName,
+  console.log('[getAudioUrl] Public audio config:', {
+    enabled: PUBLIC_AUDIO_CONFIG.enabled,
+    baseUrl: PUBLIC_AUDIO_CONFIG.baseUrl,
+    prefix: PUBLIC_AUDIO_CONFIG.prefix,
+    bucketName: PUBLIC_AUDIO_CONFIG.bucketName,
   });
   
   // 1. Check direct URL mappings first (highest priority)
@@ -91,12 +98,12 @@ export function getAudioUrl(localPath: string): string {
     return url;
   }
   
-  // 2. Generate S3 URL if enabled
-  if (S3_CONFIG.enabled) {
-    const s3Url = getS3Url(localPath);
-    if (s3Url) {
-      console.log('[getAudioUrl] Generated S3 URL:', s3Url);
-      return s3Url;
+  // 2. Generate public URL if enabled
+  if (PUBLIC_AUDIO_CONFIG.enabled) {
+    const publicUrl = getPublicUrl(localPath);
+    if (publicUrl) {
+      console.log('[getAudioUrl] Generated public URL:', publicUrl);
+      return publicUrl;
     }
   }
   
