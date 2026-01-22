@@ -10,10 +10,6 @@
 // Public audio configuration (Cloudflare R2, S3, or CDN)
 // Option 1: Use a public CDN/custom domain (recommended)
 const PUBLIC_AUDIO_CONFIG = {
-  // Set this to your public R2/custom domain or CDN URL
-  // Examples:
-  // - 'https://media.yourdomain.com'
-  // - 'https://<account>.r2.cloudflarestorage.com/<bucket>'
   baseUrl:
     import.meta.env.VITE_PUBLIC_AUDIO_BASE_URL ||
     import.meta.env.VITE_S3_BASE_URL ||
