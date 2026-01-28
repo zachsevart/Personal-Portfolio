@@ -11,7 +11,6 @@ export function DJMixes() {
       date: "2025-01-08",
       duration: "55 min",
       description: "A mix of Deep house and pop remixes so that the people dont get upset",
-      // This will use blob URL if available, otherwise fallback to local path
       audioFile: "01 Halloween_1outof4.wav"
     },
     {
@@ -51,7 +50,6 @@ export function DJMixes() {
         <h1 className="text-4xl mb-8 text-white drop-shadow-lg">DJ Mixes</h1>
       <div className="space-y-8">
         {mixes.map((mix) => {
-          // Get blob URL if available, otherwise use local path
           const audioUrl = getAudioUrl(mix.audioFile);
           
           return (
