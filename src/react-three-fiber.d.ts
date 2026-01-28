@@ -16,6 +16,7 @@ declare global {
       meshLambertMaterial: React.DetailedHTMLProps<any, any>;
       pointLight: React.DetailedHTMLProps<any, any>;
       ambientLight: React.DetailedHTMLProps<any, any>;
+    
       directionalLight: React.DetailedHTMLProps<any, any>;
       spotLight: React.DetailedHTMLProps<any, any>;
       hemisphereLight: React.DetailedHTMLProps<any, any>;
