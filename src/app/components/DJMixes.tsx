@@ -32,10 +32,18 @@ export function DJMixes() {
     {
       id: 4,
       title: "Australia Mix 1",
-      date: "2024-04-29",
+      date: "2025-04-29",
       duration: "32 min",
       description: "Peak time tech recorded at Lass O'Gowrie open decks",
       audioFile: "01 mix009.wav"
+    },
+    {
+      id: 5,
+      title: "Song Demo",
+      date: "2026-02-15",
+      duration: "3 min",
+      description: "First song I have made, start to finish",
+      audioFile: "finishedjudah3.wav"
     }
   ];
 
