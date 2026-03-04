@@ -7,7 +7,8 @@
     "build": "vite build",
     "dev": "vite",
     "upload-audio": "node scripts/upload-audio.js && node scripts/generate-audio-mapping.js",
-    "generate-audio-mapping": "node scripts/generate-audio-mapping.js"
+    "generate-audio-mapping": "node scripts/generate-audio-mapping.js",
+    "generate-peaks": "node scripts/generate-peaks.js"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -68,7 +69,8 @@
     "sonner": "2.0.3",
     "tailwind-merge": "^3.2.0",
     "three": "^0.182.0",
-    "vaul": "1.1.2"
+    "vaul": "1.1.2",
+    "wavesurfer.js": "^7.12.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",

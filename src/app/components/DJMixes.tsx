@@ -2,6 +2,7 @@ import { AudioPlayer } from './AudioPlayer';
 import { getAudioUrl } from '../../config/audio-urls';
 import { BubbleBackground } from '@/components/animate-ui/components/backgrounds/bubble';
 import { activeColors4 } from '@/config/bubble-colors';
+import audioPeaks from '@/config/audio-peaks.json';
 
 export function DJMixes() {
   const mixes = [
@@ -70,7 +71,11 @@ export function DJMixes() {
               <div className="text-sm mb-3 text-white/70">{mix.date}</div>
               <p className="mb-4 leading-relaxed text-white/90">{mix.description}</p>
               
-              <AudioPlayer title={mix.title} audioUrl={audioUrl} />
+              <AudioPlayer
+                title={mix.title}
+                audioUrl={audioUrl}
+                precomputedPeaks={(audioPeaks as Record<string, { peaks: number[][]; duration: number }>)[mix.audioFile]}
+              />
             </article>
             </div>
           );
