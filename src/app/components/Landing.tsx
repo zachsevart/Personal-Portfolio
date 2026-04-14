@@ -25,12 +25,12 @@ export function Landing() {
           
           <div className="text-xl md:text-2xl lg:text-3xl space-y-6 mb-12 max-w-3xl leading-relaxed text-white/90 drop-shadow-md">
             <p>
-              DJ and Producer based in Kansas City
+              DJ and Producer based in Lawrence, KS
             </p>
           </div>
           <div className="text-lg md:text-xl lg:text-2xl space-y-6 mb-12 max-w-3xl leading-relaxed text-white/80 drop-shadow-md">
             <p>
-              Mixing techno, house, and everything in between.
+              Mixing techno, house, and open format.
             </p>
           </div>
 
