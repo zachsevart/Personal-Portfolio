@@ -5,6 +5,8 @@ import { Landing } from './components/Landing';
 import { DJMixes } from './components/DJMixes';
 import { About } from './components/About';
 import { Updates } from './components/Updates';
+import { Events } from './components/Events';
+import { Booking } from './components/Booking';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -22,6 +24,8 @@ function AnimatedRoutes() {
         <Routes location={location}>
           <Route path="/" element={<Landing />} />
           <Route path="/mixes" element={<DJMixes />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/booking" element={<Booking />} />
           <Route path="/about" element={<About />} />
           <Route path="/updates" element={<Updates />} />
         </Routes>
@@ -33,14 +37,14 @@ function AnimatedRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-white text-black">
+      <div className="min-h-screen bg-black text-white">
         <Header />
         <main className="pb-24 relative overflow-hidden">
           <AnimatedRoutes />
         </main>
-        <footer className="border-t border-black py-8">
+        <footer className="border-t border-white/30 py-8">
           <div className="max-w-5xl mx-auto px-6 text-center text-sm opacity-60">
-            © 2026 — Zach Sevart
+            © 2026 — zachtrax
           </div>
         </footer>
       </div>
