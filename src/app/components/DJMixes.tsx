@@ -53,7 +53,7 @@ export function DJMixes() {
       className="min-h-[calc(100vh-200px)] w-full py-12"
       interactive={true}
       colors={activeColors4}
-      backgroundGradient="from-gray-900 to-slate-900"
+      backgroundGradient="from-black to-black"
     >
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <h1 className="text-4xl mb-8 text-white drop-shadow-lg">DJ Mixes</h1>

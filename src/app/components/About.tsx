@@ -35,7 +35,7 @@ export function About() {
       className="min-h-[calc(100vh-200px)] w-full py-12"
       interactive={true}
       colors={activeColors2}
-      backgroundGradient="from-gray-900 to-slate-900"
+      backgroundGradient="from-black to-black"
     >
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         <h1 className="text-3xl mb-8 text-white drop-shadow-lg">About</h1>

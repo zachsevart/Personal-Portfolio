@@ -72,7 +72,7 @@ export function Updates() {
       className="min-h-[calc(100vh-200px)] w-full py-12"
       interactive={true}
       colors={activeColors3}
-      backgroundGradient="from-gray-900 to-slate-900"
+      backgroundGradient="from-black to-black"
     >
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <div className="mb-8">
