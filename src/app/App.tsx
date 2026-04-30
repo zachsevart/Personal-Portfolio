@@ -4,7 +4,6 @@ import { Header } from './components/Header';
 import { Landing } from './components/Landing';
 import { DJMixes } from './components/DJMixes';
 import { About } from './components/About';
-import { Updates } from './components/Updates';
 import { Events } from './components/Events';
 import { Booking } from './components/Booking';
 
@@ -27,7 +26,6 @@ function AnimatedRoutes() {
           <Route path="/events" element={<Events />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/about" element={<About />} />
-          <Route path="/updates" element={<Updates />} />
         </Routes>
       </motion.div>
     </AnimatePresence>

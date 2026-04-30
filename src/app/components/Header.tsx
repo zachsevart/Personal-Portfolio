@@ -39,12 +39,6 @@ export function Header() {
             >
               about
             </Link>
-            <Link
-              to="/updates"
-              className={`hover:underline ${isActive('/updates') ? 'underline' : ''}`}
-            >
-              updates
-            </Link>
           </div>
         </nav>
       </div>
