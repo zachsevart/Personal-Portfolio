@@ -52,6 +52,16 @@ function BubbleBackground({
   const rectRef = React.useRef<DOMRect | null>(null);
   const rafIdRef = React.useRef<number | null>(null);
 
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   React.useLayoutEffect(() => {
     const updateRect = () => {
       if (containerRef.current) {
@@ -135,13 +145,17 @@ function BubbleBackground({
           <filter id="goo">
             <feGaussianBlur
               in="SourceGraphic"
-              stdDeviation="16"
+              stdDeviation={isMobile ? 24 : 16}
               result="blur"
             />
             <feColorMatrix
               in="blur"
               mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+              values={
+                isMobile
+                  ? '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 10 -4'
+                  : '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8'
+              }
               result="goo"
             />
             <feBlend in="SourceGraphic" in2="goo" />
@@ -151,7 +165,7 @@ function BubbleBackground({
 
       <div
         className="absolute inset-0"
-        style={{ filter: 'url(#goo) blur(40px)' }}
+        style={{ filter: `url(#goo) blur(${isMobile ? 60 : 40}px)` }}
       >
         <motion.div
           className="absolute rounded-full size-[80%] top-[10%] left-[10%] mix-blend-hard-light bg-[radial-gradient(circle_at_center,rgba(var(--first-color),0.8)_0%,rgba(var(--first-color),0)_50%)]"
