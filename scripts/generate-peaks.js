@@ -24,6 +24,7 @@ const R2_BASE = 'https://pub-8c8c1854d91a4bc381840a168a546fd3.r2.dev';
 
 // Must match the audioFile values in DJMixes.tsx
 const FILES = [
+  '01 mix5-6-26.wav',
   '01 Halloween_1outof4.wav',
   '01 mix006.wav',
   '01 mix007.wav',

@@ -7,6 +7,15 @@ import audioPeaks from '@/config/audio-peaks.json';
 export function DJMixes() {
   const mixes = [
     {
+      id: 6,
+      title: "ZACHTRAXMIX-_-01",
+      date: "2026-05-06",
+      duration: "48 min",
+      description: "Some new stuff",
+      audioFile: "01 mix5-6-26.wav",
+      image: "/images/zachtraxmix-01.jpg"
+    },
+    {
       id: 1,
       title: "AEPI Halloween MIX",
       date: "2025-01-08",
@@ -64,6 +73,9 @@ export function DJMixes() {
           return (
             <div className="bg-black/20 rounded-lg p-4"> 
             <article key={mix.id} className="border-b border-white/30 pb-8">
+              {'image' in mix && mix.image && (
+                <img src={mix.image} alt={mix.title} className="w-32 h-32 rounded-lg object-cover mb-4" />
+              )}
               <div className="flex justify-between items-baseline mb-2">
                 <h2 className="text-2xl text-white drop-shadow-md">{mix.title}</h2>
                 <span className="text-sm text-white/90">{mix.duration}</span>
