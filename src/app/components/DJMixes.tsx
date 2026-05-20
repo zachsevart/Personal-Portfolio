@@ -7,6 +7,15 @@ import audioPeaks from '@/config/audio-peaks.json';
 export function DJMixes() {
   const mixes = [
     {
+      id: 7,
+      title: "ZACHTRAXMIX-_-02",
+      date: "2026-05-18",
+      duration: "31 min",
+      description: "i made this at 1pm hungover on a monday",
+      audioFile: "01 REC-2026-05-18.wav",
+      image: "/images/IMG_8653.JPG"
+    },
+    {
       id: 6,
       title: "ZACHTRAXMIX-_-01",
       date: "2026-05-06",
