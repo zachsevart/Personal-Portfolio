@@ -1,0 +1,63 @@
+import type { Mix } from './types';
+
+// DJ mixes, newest-first. Consumed by the /mixes page and the club Mixes section.
+export const mixes: Mix[] = [
+  {
+    id: 7,
+    title: 'ZACHTRAXMIX-_-02',
+    date: '2026-05-18',
+    duration: '31 min',
+    description: 'i made this at 1pm hungover on a monday',
+    audioFile: '01 REC-2026-05-18.wav',
+    image: '/images/IMG_8653.JPG',
+  },
+  {
+    id: 6,
+    title: 'ZACHTRAXMIX-_-01',
+    date: '2026-05-06',
+    duration: '48 min',
+    description: 'Some new stuff',
+    audioFile: '01 mix5-6-26.wav',
+    image: '/images/zachtraxmix-01.jpg',
+  },
+  {
+    id: 1,
+    title: 'AEPI Halloween MIX',
+    date: '2025-01-08',
+    duration: '55 min',
+    description: 'A mix of Deep house and pop remixes so that the people dont get upset',
+    audioFile: '01 Halloween_1outof4.wav',
+  },
+  {
+    id: 2,
+    title: 'Random Mix',
+    date: '2024-12-15',
+    duration: '40 min',
+    description: 'Some deep cuts and other stuff i liked',
+    audioFile: '01 mix006.wav',
+  },
+  {
+    id: 3,
+    title: 'Australia Mix 2',
+    date: '2025-05-22',
+    duration: '44 min',
+    description: 'Random deep cuts i liked',
+    audioFile: '01 mix007.wav',
+  },
+  {
+    id: 4,
+    title: 'Australia Mix 1',
+    date: '2025-04-29',
+    duration: '32 min',
+    description: "Peak time tech recorded at Lass O'Gowrie open decks",
+    audioFile: '01 mix009.wav',
+  },
+  {
+    id: 5,
+    title: 'Song Demo',
+    date: '2026-02-15',
+    duration: '3 min',
+    description: 'First song I have made, start to finish',
+    audioFile: 'finishedjudah3.wav',
+  },
+];

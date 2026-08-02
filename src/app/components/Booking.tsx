@@ -1,32 +1,11 @@
-import { useState } from 'react';
-import { Mail, Music } from 'lucide-react';
 import { BubbleBackground } from '@/components/animate-ui/components/backgrounds/bubble';
 import { activeColors2 } from '@/config/bubble-colors';
+import { useBookingForm } from '@/content/useBookingForm';
+import { bookingSocials, CONTACT_EMAIL } from '@/content/socials';
+import { ConnectList } from './ConnectList';
 
 export function Booking() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    eventDate: '',
-    venue: '',
-    eventType: '',
-    details: '',
-  });
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Booking Inquiry — ${formData.eventType || 'Event'} on ${formData.eventDate || 'TBD'}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\nDate: ${formData.eventDate}\nVenue: ${formData.venue}\nEvent Type: ${formData.eventType}\n\nDetails:\n${formData.details}`
-    );
-    window.location.href = `mailto:zachsevart@ku.edu?subject=${subject}&body=${body}`;
-    setSubmitted(true);
-  };
+  const { formData, submitted, handleChange, handleSubmit } = useBookingForm();
 
   return (
     <BubbleBackground
@@ -45,7 +24,7 @@ export function Booking() {
           <div className="border border-white/20 rounded-lg p-8 text-center">
             <p className="text-white text-xl mb-2">Your email client should have opened.</p>
             <p className="text-white/60">If it didn't, send your inquiry to{' '}
-              <a href="mailto:zachsevart@ku.edu" className="text-white underline">zachsevart@ku.edu</a>
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">{CONTACT_EMAIL}</a>
             </p>
           </div>
         ) : (
@@ -145,24 +124,7 @@ export function Booking() {
 
         <div className="mt-16 pt-8 border-t border-white/30">
           <h2 className="text-xl mb-4 text-white">Or reach out directly</h2>
-          <div className="space-y-3">
-            <a
-              href="mailto:zachsevart@ku.edu"
-              className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
-            >
-              <Mail size={20} />
-              <span>zachsevart@ku.edu</span>
-            </a>
-            <a
-              href="https://soundcloud.com/user-170634185"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 text-white/90 hover:text-white transition-colors"
-            >
-              <Music size={20} />
-              <span>SoundCloud</span>
-            </a>
-          </div>
+          <ConnectList links={bookingSocials} />
         </div>
       </div>
     </BubbleBackground>
