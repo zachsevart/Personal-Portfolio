@@ -3,6 +3,10 @@ import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, RoundedBox, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
+import { useInView, usePageVisible } from './useInView';
+
+const isMobile =
+  typeof window !== 'undefined' && window.matchMedia?.('(max-width: 768px)').matches;
 
 // Rotating turntable platter
 function Turntable({ rotationSpeed = 1 }: { rotationSpeed?: number }) {
@@ -103,7 +107,7 @@ function DeckModel({ modelPath, scale = 1 }: { modelPath: string; scale?: number
 // Main deck structure - now uses GLTF model
 function Deck() {
   // Pioneer DJ Console GLTF model
-  const modelPath = '/pioneer_dj_console/scene.gltf';
+  const modelPath = '/pioneer_cdj_3000_pioneer_djm_a9/scene.gltf';
   const groupRef = useRef<THREE.Group>(null);
   
   // Animate rotation back and forth
@@ -124,23 +128,36 @@ function Deck() {
       </mesh>
 
       {/* GLTF Model - adjust scale here to make model smaller/larger */}
-      <DeckModel modelPath={modelPath} scale={0.10} />
+      <DeckModel modelPath={modelPath} scale={1.0} />
 
       {/* Enhanced lighting for better model visibility */}
-      <pointLight position={[5, 5, 5]} intensity={1.5} />
-      <pointLight position={[-5, 5, -5]} intensity={1} />
-      <pointLight position={[0, 5, 0]} intensity={1} />
-      <ambientLight intensity={0.8} />
-      <directionalLight position={[10, 10, 5]} intensity={0.5} />
+      <pointLight position={[5, 5, 5]} intensity={4} />
+      <pointLight position={[-5, 5, -5]} intensity={3} />
+      <pointLight position={[0, 6, 0]} intensity={3} />
+      {/* Front fill from the camera's direction so visible faces stay bright */}
+      <pointLight position={[6, 5, 6]} intensity={5} />
+      <spotLight position={[0, 8, 4]} angle={0.9} penumbra={0.6} intensity={4} />
+      <ambientLight intensity={2.6} />
+      <directionalLight position={[10, 10, 5]} intensity={2} />
     </group>
   );
 }
 
 // Main component - smaller, inline version
 export function DJDeck() {
+  const holderRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(holderRef);
+  const pageVisible = usePageVisible();
   return (
-    <div className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] xl:w-[600px] xl:h-[600px]">
-      <Canvas shadows>
+    <div
+      ref={holderRef}
+      className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] xl:w-[600px] xl:h-[600px]"
+    >
+      <Canvas
+        shadows={!isMobile}
+        dpr={isMobile ? [1, 1.5] : [1, 2]}
+        frameloop={inView && pageVisible ? 'always' : 'never'}
+      >
         <PerspectiveCamera makeDefault position={[6, 5, 6]} fov={60} />
         <OrbitControls
           enablePan={false}
