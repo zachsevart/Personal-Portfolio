@@ -1,0 +1,11 @@
+Model Information:
+* title:	Pioneer CDJ 3000 Pioneer DJM A9
+* source:	https://sketchfab.com/3d-models/pioneer-cdj-3000-pioneer-djm-a9-de807aa8a5e146bb866b95b58d0c531b
+* author:	MaxTht (https://sketchfab.com/thetiot.maxime)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Pioneer CDJ 3000 Pioneer DJM A9" (https://sketchfab.com/3d-models/pioneer-cdj-3000-pioneer-djm-a9-de807aa8a5e146bb866b95b58d0c531b) by MaxTht (https://sketchfab.com/thetiot.maxime) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

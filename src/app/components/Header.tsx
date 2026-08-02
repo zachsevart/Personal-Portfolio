@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { ModeToggle } from './ModeToggle';
 
 export function Header() {
   const location = useLocation();
@@ -10,11 +11,12 @@ export function Header() {
   return (
     <header className="border-b border-white/30 py-6 mb-12">
       <div className="max-w-5xl mx-auto px-6">
-        <nav className="flex items-center justify-between">
+        <nav className="flex items-center justify-between gap-6">
           <Link to="/" className="text-xl tracking-tight hover:opacity-60 transition-opacity">
             zachtrax
           </Link>
-          <div className="flex gap-8">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-8">
             <Link
               to="/mixes"
               className={`hover:underline ${isActive('/mixes') ? 'underline' : ''}`}
@@ -39,6 +41,8 @@ export function Header() {
             >
               about
             </Link>
+            </div>
+            <ModeToggle />
           </div>
         </nav>
       </div>
