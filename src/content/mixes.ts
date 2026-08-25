@@ -3,6 +3,15 @@ import type { Mix } from './types';
 // DJ mixes, newest-first. Consumed by the /mixes page and the club Mixes section.
 export const mixes: Mix[] = [
   {
+    id: 8,
+    title: 'Codeine Crazy',
+    date: '2026-08-25',
+    duration: '6 min',
+    description: "Remix of one of my favorite rap songs, couldn't post anywhere else because of copyright :(",
+    audioFile: 'Cdne Crzy .wav',
+    image: '/images/codeine-crazy.jpg',
+  },
+  {
     id: 7,
     title: 'ZACHTRAXMIX-_-02',
     date: '2026-05-18',
