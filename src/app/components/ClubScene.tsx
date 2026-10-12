@@ -1,7 +1,7 @@
 // @ts-nocheck - TypeScript types for React Three Fiber should work after restarting TS server
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PerspectiveCamera, MeshReflectorMaterial, useGLTF, Text, useVideoTexture } from '@react-three/drei';
+import { PerspectiveCamera, MeshReflectorMaterial, PerformanceMonitor, SpotLight, useGLTF, Text, useVideoTexture } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { AnimatePresence, motion } from 'motion/react';
 import * as THREE from 'three';
@@ -15,9 +15,11 @@ import { bio } from '@/content/bio';
 import { primarySocials, CONTACT_EMAIL } from '@/content/socials';
 import { useBookingForm } from '@/content/useBookingForm';
 import { ConnectList } from './ConnectList';
+import { Crowd, Dancer, beats, kick } from './ClubCrowd';
 
-// Evaluated once at load: mobile GPUs get lighter settings (no shadows, lower
-// DPR, a cheaper floor, and a smaller crowd).
+// Evaluated once at load: mobile GPUs get lighter settings (lower DPR, a cheaper
+// floor, and a smaller crowd). No shadows anywhere: three shadow-casting beams
+// tripled the per-frame draw calls for barely visible results.
 const isMobile =
   typeof window !== 'undefined' && window.matchMedia?.('(max-width: 768px)').matches;
 
@@ -27,290 +29,16 @@ const BEAM_COLORS = ['#dd4aff', '#00dcff', '#1271ff']; // magenta, cyan, blue
 // The Pioneer CDJ + mixer model — same one used in the hero deck
 const DECK_MODEL = '/pioneer_cdj_3000_pioneer_djm_a9/scene.gltf';
 
-type DanceStyle = 'up' | 'groove' | 'sway';
-type HairStyle = 'short' | 'long' | 'bun' | 'bald';
-
 const prefersReducedMotion =
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
-// An articulated low-poly dancer with human variety: hair styles, masc/femme
-// builds, height variation, jointed limbs, and one of three dance styles.
-function Dancer({
-  position,
-  phase,
-  speed,
-  style,
-  rotationY = 0,
-  hair = 'short',
-  femme = false,
-  heightScale = 1,
-  dj = false,
-  headphones = false,
-}: {
-  position: [number, number, number];
-  phase: number;
-  speed: number;
-  style: DanceStyle;
-  rotationY?: number;
-  hair?: HairStyle;
-  femme?: boolean;
-  heightScale?: number;
-  dj?: boolean;
-  headphones?: boolean;
-}) {
-  const root = useRef<THREE.Group>(null);
-  const torso = useRef<THREE.Group>(null);
-  const head = useRef<THREE.Group>(null);
-  const lArm = useRef<THREE.Group>(null);
-  const rArm = useRef<THREE.Group>(null);
-  const lFore = useRef<THREE.Group>(null);
-  const rFore = useRef<THREE.Group>(null);
-  const lLeg = useRef<THREE.Group>(null);
-  const rLeg = useRef<THREE.Group>(null);
-
-  // Near-black skin + a slightly warmer near-black for hair, so silhouettes
-  // stay dark but hair still reads as a distinct shape.
-  const mat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#050507', roughness: 0.78, metalness: 0.08 }),
-    [],
-  );
-  const hairMat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#0c0910', roughness: 0.9, metalness: 0.05 }),
-    [],
-  );
-  // Black headphones with a faint sheen
-  const hpMat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#050506', roughness: 0.35, metalness: 0.4 }),
-    [],
-  );
-
-  const shoulder = femme ? 0.17 : 0.22; // narrower shoulders on femme builds
-  const legR = femme ? 0.06 : 0.075; // slimmer legs on femme builds
-  const legX = femme ? 0.07 : 0.09; // legs closer together on femme builds
-
-  useFrame(({ clock }) => {
-    if (prefersReducedMotion || !root.current) return;
-    const t = clock.elapsedTime * speed + phase;
-    const s = Math.sin(t);
-    const bounce = Math.abs(s); // up-only, like stepping to a beat
-
-    // DJ: planted at the decks, leaning in, nodding, hands working the gear
-    if (dj) {
-      root.current.position.y = bounce * 0.03;
-      root.current.rotation.z = Math.sin(t * 0.5) * 0.02;
-      root.current.rotation.y = rotationY + Math.sin(t * 0.4) * 0.05;
-      if (torso.current) {
-        torso.current.rotation.x = 0.2 + s * 0.03; // leaning over the decks
-        torso.current.rotation.y = Math.sin(t * 0.5) * 0.05;
-      }
-      if (head.current) {
-        head.current.rotation.x = 0.14 + Math.abs(Math.sin(t * 2)) * 0.12; // nodding to the beat
-        head.current.rotation.z = Math.sin(t) * 0.06;
-      }
-      if (lLeg.current) lLeg.current.rotation.x = s * 0.04;
-      if (rLeg.current) rLeg.current.rotation.x = -s * 0.04;
-      // Hands reaching forward/down onto the deck; right hand rides the jog wheel
-      if (lArm.current) (lArm.current.rotation.x = -1.15), (lArm.current.rotation.z = 0.22);
-      if (rArm.current)
-        (rArm.current.rotation.x = -1.05 + Math.sin(t * 3) * 0.14), (rArm.current.rotation.z = -0.22);
-      if (lFore.current) lFore.current.rotation.x = -0.5;
-      if (rFore.current) rFore.current.rotation.x = -0.55 + Math.sin(t * 3 + 1) * 0.12;
-      return;
-    }
-
-    // Whole body bob + sway from the feet (rotationY sets which way they face)
-    root.current.position.y = bounce * 0.15;
-    root.current.rotation.z = Math.sin(t * 0.5) * 0.05;
-    root.current.rotation.y = rotationY + Math.sin(t * 0.25 + phase) * 0.12;
-
-    // Torso lean + twist
-    if (torso.current) {
-      torso.current.rotation.x = s * 0.06;
-      torso.current.rotation.y = Math.sin(t * 0.5) * 0.12;
-    }
-    // Head bob
-    if (head.current) {
-      head.current.rotation.z = Math.sin(t + 0.4) * 0.14;
-      head.current.rotation.x = bounce * 0.1;
-    }
-    // Weight-shifting legs (pivot at hips)
-    if (lLeg.current) lLeg.current.rotation.x = s * 0.22;
-    if (rLeg.current) rLeg.current.rotation.x = -s * 0.22;
-
-    // Arms vary by dance style
-    if (style === 'up') {
-      const wave = Math.sin(t * 2);
-      if (lArm.current) (lArm.current.rotation.z = 2.5), (lArm.current.rotation.x = wave * 0.3);
-      if (rArm.current) (rArm.current.rotation.z = -2.5), (rArm.current.rotation.x = -wave * 0.3);
-      if (lFore.current) lFore.current.rotation.x = 0.3 + wave * 0.2;
-      if (rFore.current) rFore.current.rotation.x = 0.3 - wave * 0.2;
-    } else if (style === 'groove') {
-      if (lArm.current) (lArm.current.rotation.x = s * 0.7), (lArm.current.rotation.z = 0.18);
-      if (rArm.current) (rArm.current.rotation.x = -s * 0.7), (rArm.current.rotation.z = -0.18);
-      if (lFore.current) lFore.current.rotation.x = 0.5 + bounce * 0.3;
-      if (rFore.current) rFore.current.rotation.x = 0.5 + bounce * 0.3;
-    } else {
-      const sway = Math.sin(t * 0.5);
-      if (lArm.current) lArm.current.rotation.z = 0.5 + sway * 0.3;
-      if (rArm.current) rArm.current.rotation.z = -0.5 - sway * 0.3;
-      if (lFore.current) lFore.current.rotation.x = 0.4;
-      if (rFore.current) rFore.current.rotation.x = 0.4;
-    }
-  });
-
-  return (
-    <group position={position} scale={heightScale}>
-      <group ref={root}>
-        {/* Torso pivots at the hips */}
-        <group ref={torso} position={[0, 0.9, 0]}>
-          <mesh position={[0, 0.24, 0]} scale={[femme ? 0.9 : 1, 1, 1]} material={mat} castShadow>
-            <capsuleGeometry args={[0.16, 0.38, 6, 12]} />
-          </mesh>
-          {/* Head + hair */}
-          <group ref={head} position={[0, 0.6, 0]}>
-            <mesh material={mat} castShadow>
-              <sphereGeometry args={[0.145, 16, 16]} />
-            </mesh>
-            {hair !== 'bald' && (
-              // Hair cap covering the top/back of the head
-              <mesh position={[0, 0.02, -0.02]} scale={[1.1, 1.05, 1.12]} material={hairMat} castShadow>
-                <sphereGeometry args={[0.15, 12, 12, 0, Math.PI * 2, 0, Math.PI * 0.62]} />
-              </mesh>
-            )}
-            {hair === 'long' && (
-              // Hair falling down the back
-              <mesh position={[0, -0.2, -0.07]} material={hairMat} castShadow>
-                <capsuleGeometry args={[0.13, 0.3, 4, 8]} />
-              </mesh>
-            )}
-            {hair === 'bun' && (
-              <mesh position={[0, 0.17, -0.05]} material={hairMat} castShadow>
-                <sphereGeometry args={[0.075, 10, 10]} />
-              </mesh>
-            )}
-            {headphones && (
-              <group>
-                {/* Headband over the top, ear to ear */}
-                <mesh position={[0, 0.03, 0]} material={hpMat} castShadow>
-                  <torusGeometry args={[0.155, 0.028, 8, 20, Math.PI]} />
-                </mesh>
-                {/* Ear cups */}
-                <mesh position={[0.155, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={hpMat} castShadow>
-                  <cylinderGeometry args={[0.058, 0.058, 0.05, 16]} />
-                </mesh>
-                <mesh position={[-0.155, 0, 0]} rotation={[0, 0, Math.PI / 2]} material={hpMat} castShadow>
-                  <cylinderGeometry args={[0.058, 0.058, 0.05, 16]} />
-                </mesh>
-              </group>
-            )}
-          </group>
-          {/* Left arm: shoulder + elbow */}
-          <group ref={lArm} position={[shoulder, 0.48, 0]}>
-            <mesh position={[0, -0.16, 0]} material={mat} castShadow>
-              <capsuleGeometry args={[0.055, 0.24, 4, 8]} />
-            </mesh>
-            <group ref={lFore} position={[0, -0.32, 0]}>
-              <mesh position={[0, -0.14, 0]} material={mat} castShadow>
-                <capsuleGeometry args={[0.05, 0.22, 4, 8]} />
-              </mesh>
-            </group>
-          </group>
-          {/* Right arm */}
-          <group ref={rArm} position={[-shoulder, 0.48, 0]}>
-            <mesh position={[0, -0.16, 0]} material={mat} castShadow>
-              <capsuleGeometry args={[0.055, 0.24, 4, 8]} />
-            </mesh>
-            <group ref={rFore} position={[0, -0.32, 0]}>
-              <mesh position={[0, -0.14, 0]} material={mat} castShadow>
-                <capsuleGeometry args={[0.05, 0.22, 4, 8]} />
-              </mesh>
-            </group>
-          </group>
-        </group>
-        {/* Solid A-line dress for femme builds (truncated cone: narrow waist → wide hem) */}
-        {femme && (
-          <mesh position={[0, 0.6, 0]} material={mat} castShadow>
-            <cylinderGeometry args={[0.16, 0.36, 0.62, 16, 1]} />
-          </mesh>
-        )}
-        {/* Legs pivot at the hips */}
-        <group ref={lLeg} position={[legX, 0.9, 0]}>
-          <mesh position={[0, -0.45, 0]} material={mat} castShadow>
-            <capsuleGeometry args={[legR, 0.62, 4, 8]} />
-          </mesh>
-        </group>
-        <group ref={rLeg} position={[-legX, 0.9, 0]}>
-          <mesh position={[0, -0.45, 0]} material={mat} castShadow>
-            <capsuleGeometry args={[legR, 0.62, 4, 8]} />
-          </mesh>
-        </group>
-      </group>
-    </group>
-  );
-}
-
-// A crowd of dancers arranged facing the booth
-function Crowd() {
-  const dancers = useMemo(() => {
-    const arr: {
-      position: [number, number, number];
-      phase: number;
-      speed: number;
-      style: DanceStyle;
-      hair: HairStyle;
-      femme: boolean;
-      heightScale: number;
-    }[] = [];
-    let seed = 1337;
-    const rand = () => {
-      // Deterministic pseudo-random so the crowd layout is stable
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      return seed / 0x7fffffff;
-    };
-    const styles: DanceStyle[] = ['up', 'groove', 'sway'];
-    const femmeHair: HairStyle[] = ['long', 'bun', 'long', 'short'];
-    const mascHair: HairStyle[] = ['short', 'short', 'bald', 'bun'];
-    // Smaller crowd on mobile for performance
-    const rows = isMobile ? 3 : 4;
-    const perRow = isMobile ? 5 : 6;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < perRow; c++) {
-        const z = 1 + r * 1.5 + (rand() - 0.5) * 0.6;
-        const x = (c - (perRow - 1) / 2) * 1.5 + (rand() - 0.5) * 0.7;
-        const femme = rand() > 0.5;
-        const hair = (femme ? femmeHair : mascHair)[Math.floor(rand() * 4)];
-        // Femme builds run a touch shorter on average
-        const heightScale = (femme ? 0.9 : 0.98) + rand() * 0.14;
-        arr.push({
-          position: [x, 0, z],
-          phase: rand() * Math.PI * 2,
-          speed: 3.0 + rand() * 1.8,
-          style: styles[Math.floor(rand() * styles.length)],
-          hair,
-          femme,
-          heightScale,
-        });
-      }
-    }
-    return arr;
-  }, []);
-
-  return (
-    <group>
-      {dancers.map((d, i) => (
-        <Dancer key={i} {...d} />
-      ))}
-    </group>
-  );
-}
 
 // The real Pioneer CDJ + mixer model, raised onto the console at hand height
 function BoothDeck() {
   const { scene } = useGLTF(DECK_MODEL);
   const cloned = useMemo(() => scene.clone(), [scene]);
   return (
-    <primitive object={cloned} scale={0.25} position={[0, 1.25, 0.1]} rotation={[0, Math.PI, 0]} />
+    <primitive object={cloned} scale={0.25} position={[0, 1.53, 0.1]} rotation={[0, Math.PI, 0]} />
   );
 }
 
@@ -380,7 +108,7 @@ function VideoScreen() {
   return (
     <group position={[0, 2.7, -2.1]}>
       {/* Bezel / frame */}
-      <mesh castShadow>
+      <mesh>
         <boxGeometry args={[6.4, 3.7, 0.18]} />
         <meshStandardMaterial color="#040405" roughness={0.6} metalness={0.5} />
       </mesh>
@@ -392,8 +120,8 @@ function VideoScreen() {
       ) : (
         <ScreenPlaceholder />
       )}
-      {/* Faint screen backlight spilling forward onto the booth */}
-      <pointLight position={[0, -0.6, 1.6]} intensity={5} color="#2a4bd0" distance={8} />
+      {/* Faint screen backlight spilling forward; sits behind the DJ so it rims him */}
+      <pointLight position={[0, -0.6, 0.9]} intensity={5} color="#2a4bd0" distance={8} />
     </group>
   );
 }
@@ -424,7 +152,7 @@ function NeonSign() {
   });
 
   return (
-    <group position={[0, 1.16, 0.98]}>
+    <group position={[0, 1.3, 0.98]}>
       {/* Main tube glow */}
       <Text font="/fonts/Neonderthaw-Regular.ttf" fontSize={0.62} anchorX="center" anchorY="middle">
         zachtrax
@@ -453,7 +181,7 @@ function Speaker({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
       {/* Cabinet */}
-      <mesh position={[0, 1.0, 0]} castShadow receiveShadow>
+      <mesh position={[0, 1.0, 0]}>
         <boxGeometry args={[1.1, 2.0, 1.0]} />
         <meshStandardMaterial color="#08080a" roughness={0.85} metalness={0.2} />
       </mesh>
@@ -479,18 +207,18 @@ function Booth() {
   return (
     <group position={[0, 0, -4.5]}>
       {/* Riser */}
-      <mesh position={[0, 0.35, 0]} castShadow receiveShadow>
+      <mesh position={[0, 0.35, 0]}>
         <boxGeometry args={[5, 0.7, 1.8]} />
         <meshStandardMaterial color="#0a0a0d" roughness={0.8} />
       </mesh>
       {/* Booth front panel */}
-      <mesh position={[0, 1.0, 0.85]} castShadow>
-        <boxGeometry args={[4.2, 0.9, 0.15]} />
+      <mesh position={[0, 1.14, 0.85]}>
+        <boxGeometry args={[4.2, 1.18, 0.15]} />
         <meshStandardMaterial color="#050506" roughness={0.6} metalness={0.3} />
       </mesh>
-      {/* Console the deck sits on, raised to hand height */}
-      <mesh position={[0, 0.975, 0.1]} castShadow receiveShadow>
-        <boxGeometry args={[3.6, 0.55, 1.1]} />
+      {/* Console the deck sits on: top ~0.85m above the riser, around waist height */}
+      <mesh position={[0, 1.115, 0.1]}>
+        <boxGeometry args={[3.6, 0.83, 1.1]} />
         <meshStandardMaterial color="#0b0b0f" roughness={0.7} metalness={0.3} />
       </mesh>
       {/* Large screen behind the DJ */}
@@ -502,24 +230,16 @@ function Booth() {
       {/* PA speakers flanking the stand, facing the crowd */}
       <Speaker position={[-3.2, 0, 0.3]} />
       <Speaker position={[3.2, 0, 0.3]} />
-      {/* DJ (Zach) working the decks, facing the crowd, in headphones */}
-      <Dancer
-        position={[0, 0.72, -0.5]}
-        phase={0.5}
-        speed={2.4}
-        style="groove"
-        rotationY={0}
-        hair="short"
-        dj
-        headphones
-      />
+      {/* DJ (Zach) just behind the console, facing the crowd, in headphones */}
+      <Dancer position={[0, 0.7, -0.62]} body="zach" dj headphones />
     </group>
   );
 }
 
 useGLTF.preload(DECK_MODEL);
 
-// A sweeping colored beam: visible additive light shaft + real wash light
+// A sweeping colored beam: visible additive light shaft + real wash light,
+// sweeping on a 32-beat cycle and punching brighter on every kick.
 function Beam({
   color,
   phase,
@@ -530,50 +250,102 @@ function Beam({
   origin: [number, number, number];
 }) {
   const pivotRef = useRef<THREE.Group>(null);
+  const light = useRef<THREE.SpotLight>(null);
+  // Aim point rides inside the pivot so the light (and its cone) follow the sweep
+  // (a default SpotLight target sits at the world origin forever).
+  const [target] = useState(() => new THREE.Object3D());
 
   useFrame(({ clock }) => {
     if (!pivotRef.current || prefersReducedMotion) return;
-    const t = clock.elapsedTime;
-    pivotRef.current.rotation.z = Math.sin(t * 0.35 + phase) * 0.55;
-    pivotRef.current.rotation.x = Math.cos(t * 0.27 + phase) * 0.35;
+    const b = beats(clock.elapsedTime);
+    const k = kick(b);
+    pivotRef.current.rotation.z = Math.sin((Math.PI * 2 * b) / 32 + phase) * 0.55;
+    pivotRef.current.rotation.x = Math.cos((Math.PI * 2 * b) / 40 + phase) * 0.35;
+    if (!light.current) return;
+    light.current.intensity = 160 + 140 * k;
+    // drei renders the volumetric cone as the light's child mesh
+    const cone = light.current.children[0] as THREE.Mesh | undefined;
+    if (cone) (cone.material as THREE.ShaderMaterial).uniforms.opacity.value = 0.55 + 0.45 * k;
   });
-
-  const height = 7.5;
 
   return (
     <group position={origin} ref={pivotRef}>
-      {/* Visible light shaft — cone apex at the fixture, widening toward floor */}
-      <mesh position={[0, -height / 2, 0]}>
-        <coneGeometry args={[2.2, height, 32, 1, true]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.08}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
       {/* Bright core at the fixture */}
       <mesh>
         <sphereGeometry args={[0.2, 16, 16]} />
         <meshBasicMaterial color={color} />
       </mesh>
-      {/* Real light that washes the crowd and floor with this color */}
-      <spotLight
-        position={[0, 0, 0]}
-        angle={0.42}
+      <primitive object={target} position={[0, -10, 0]} />
+      {/* Real wash light + a volumetric shaft that fades along its length and at its edges */}
+      <SpotLight
+        ref={light}
+        target={target}
+        color={color}
+        angle={0.32}
         penumbra={0.8}
         intensity={220}
-        distance={26}
-        color={color}
-        castShadow
+        distance={11}
+        attenuation={9}
+        anglePower={4}
+        radiusTop={0.15}
+        radiusBottom={2.6}
+        opacity={0.7}
       />
     </group>
   );
 }
 
-function Scene() {
+// A fan of thin HDR laser lines fired from above the screen over the crowd.
+// The fan opens/closes every 16 beats and pans every 32; bloom makes them glow.
+const LASERS_PER_FAN = 8;
+const LASER_GEO = new THREE.CylinderGeometry(0.006, 0.006, 1, 5).translate(0, 0.5, 0); // pivot at the emitter
+function LaserFan({ origin, color, pan }: { origin: [number, number, number]; color: string; pan: number }) {
+  const fan = useRef<THREE.Group>(null);
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(color).multiplyScalar(6),
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    [color],
+  );
+
+  useFrame(({ clock }) => {
+    if (!fan.current || prefersReducedMotion) return;
+    const b = beats(clock.elapsedTime);
+    const spread = 0.13 + 0.09 * Math.sin((Math.PI * 2 * b) / 16);
+    fan.current.children.forEach((beam, i) => (beam.rotation.z = (i - (LASERS_PER_FAN - 1) / 2) * spread));
+    fan.current.rotation.y = pan * 0.4 * Math.sin((Math.PI * 2 * b) / 32);
+    fan.current.rotation.x = 1.66 + 0.07 * Math.sin((Math.PI * 2 * b) / 8);
+    mat.opacity = 0.35 + 0.65 * kick(b);
+  });
+
+  return (
+    <group ref={fan} position={origin} rotation={[1.66, 0, 0, 'YXZ']}>
+      {Array.from({ length: LASERS_PER_FAN }, (_, i) => (
+        <mesh key={i} geometry={LASER_GEO} material={mat} scale={[1, 22, 1]} />
+      ))}
+    </group>
+  );
+}
+
+// Strong light from the booth aimed back over the crowd, so dancers seen from
+// behind get bright rims instead of reading as flat black cutouts.
+function Backlight() {
+  const [target] = useState(() => new THREE.Object3D());
+  return (
+    <>
+      <primitive object={target} position={[0, 1.3, 6]} />
+      <spotLight position={[0, 1.5, -3.3]} target={target} angle={0.9} penumbra={0.9} intensity={90} distance={16} color="#a98bff" />
+    </>
+  );
+}
+
+function Scene({ lowQuality }: { lowQuality: boolean }) {
   return (
     <>
       {/* Haze for depth so beams read as volumetric */}
@@ -584,10 +356,10 @@ function Scene() {
       <ambientLight intensity={0.35} />
       {/* Cool key from above the booth */}
       <pointLight position={[0, 6, -4]} intensity={30} color="#6a5cff" distance={34} />
-      {/* Accent to lift the DJ booth out of shadow */}
-      <pointLight position={[0, 2.4, -3]} intensity={16} color="#8c64ff" distance={10} />
+      {/* Rim light on the crowd (also lifts the booth front) */}
+      <Backlight />
       {/* Focused light on the deck so the opening shot reads */}
-      <pointLight position={[0, 2.3, -4.1]} intensity={24} color="#aab4ff" distance={6} />
+      <pointLight position={[0, 2.1, -3.5]} intensity={18} color="#aab4ff" distance={6} />
       {/* Colored wash lights over the crowd, matching the beams */}
       <pointLight position={[-4, 4.5, 1]} intensity={45} color="#dd4aff" distance={16} />
       <pointLight position={[4, 4.5, 1]} intensity={45} color="#00dcff" distance={16} />
@@ -597,17 +369,19 @@ function Scene() {
       <Beam color={BEAM_COLORS[0]} phase={0} origin={[-5, 8, -1]} />
       <Beam color={BEAM_COLORS[1]} phase={2.1} origin={[5, 8, -1]} />
       <Beam color={BEAM_COLORS[2]} phase={4.2} origin={[0, 8.5, 3]} />
+      <LaserFan origin={[-3.4, 4.6, -6.3]} color={BEAM_COLORS[1]} pan={1} />
+      <LaserFan origin={[3.4, 4.6, -6.3]} color={BEAM_COLORS[0]} pan={-1} />
 
       {/* The room */}
       <group>
         <Booth />
-        <Crowd />
+        <Crowd rows={isMobile ? 3 : 4} perRow={isMobile ? 5 : 7} facing={BOOTH_XZ} avoid={CAMERA_POSITIONS} />
 
         {/* Wet-look reflective floor catching the colored light.
-            Reflections are expensive, so mobile gets a plain glossy floor. */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+            Reflections are expensive, so mobile and struggling GPUs get a plain glossy floor. */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
           <circleGeometry args={[16, 64]} />
-          {isMobile ? (
+          {isMobile || lowQuality ? (
             <meshStandardMaterial color="#0a0a12" roughness={0.45} metalness={0.6} />
           ) : (
             <MeshReflectorMaterial
@@ -632,7 +406,7 @@ function Scene() {
 
 // One camera waypoint per section of the scroll journey.
 const SECTIONS = [
-  { id: 'intro', title: 'behind the decks', cam: { pos: [1.5, 2.3, -1.9], look: [-0.1, 0.95, -4.6] } },
+  { id: 'intro', title: 'behind the decks', cam: { pos: [1.5, 2.4, -1.7], look: [-0.1, 1.35, -4.6] } },
   { id: 'mixes', title: 'mixes', cam: { pos: [3.7, 2.5, 2.2], look: [-0.4, 1.2, -3.4] } },
   { id: 'events', title: 'events', cam: { pos: [-4.2, 3.0, 2.6], look: [0.3, 1.2, -3.0] } },
   { id: 'booking', title: 'booking', cam: { pos: [0, 4.6, 5.8], look: [0, 1.0, -1.5] } },
@@ -641,6 +415,8 @@ const SECTIONS = [
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]['id'];
+const CAMERA_POSITIONS = SECTIONS.map((s) => s.cam.pos);
+const BOOTH_XZ: [number, number] = [0, -4.5];
 
 // Drives the camera along the section waypoints from scroll progress (0→1)
 function ScrollRig({ progress }: { progress: React.MutableRefObject<number> }) {
@@ -768,16 +544,29 @@ const FIELD_CLASS =
   'w-full rounded border border-white/20 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-white/50 focus:outline-none transition-colors';
 
 function BookingPanel() {
-  const { formData, submitted, handleChange, handleSubmit } = useBookingForm();
+  const { formData, submitted, submitting, error, usesEmailClient, handleChange, handleSubmit } =
+    useBookingForm();
   return (
     <SectionPanel title="Booking">
       {submitted ? (
         <p className="text-sm text-white/80">
-          Your email client should have opened. If it didn't, email{' '}
-          <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">
-            {CONTACT_EMAIL}
-          </a>
-          .
+          {usesEmailClient ? (
+            <>
+              Your email client should have opened. If it didn't, email{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">
+                {CONTACT_EMAIL}
+              </a>
+              .
+            </>
+          ) : (
+            <>
+              Thanks — your inquiry is on its way. You can also reach me at{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">
+                {CONTACT_EMAIL}
+              </a>
+              .
+            </>
+          )}
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -797,9 +586,15 @@ function BookingPanel() {
             <option value="Other" className="bg-black">Other</option>
           </select>
           <textarea name="details" rows={3} placeholder="Tell me about your event" value={formData.details} onChange={handleChange} className={`${FIELD_CLASS} resize-none`} />
-          <button type="submit" className="border border-white/60 px-5 py-2 text-sm text-white transition-colors hover:bg-white hover:text-black">
-            Send inquiry →
+          <button type="submit" disabled={submitting} className="border border-white/60 px-5 py-2 text-sm text-white transition-colors hover:bg-white hover:text-black disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-white">
+            {submitting ? 'Sending…' : 'Send inquiry →'}
           </button>
+          {error && (
+            <p className="text-sm text-red-400" role="alert">
+              Couldn't send — email{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="underline">{CONTACT_EMAIL}</a> instead.
+            </p>
+          )}
         </form>
       )}
     </SectionPanel>
@@ -843,6 +638,14 @@ export function ClubScene() {
   const hint = useRef<HTMLDivElement>(null);
   const [section, setSection] = useState<SectionId>('intro');
   const sectionRef = useRef<SectionId>('intro');
+  // Adaptive quality: start mid, step resolution with measured FPS, and drop the
+  // reflective floor for good once the GPU struggles (no flip-flopping it back).
+  const [dpr, setDpr] = useState(isMobile ? 1.25 : 1.5);
+  const [lowQuality, setLowQuality] = useState(false);
+  const degrade = () => {
+    setDpr(1);
+    setLowQuality(true);
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -872,20 +675,19 @@ export function ClubScene() {
   }, []);
 
   const title = SECTIONS.find((s) => s.id === section)?.title ?? '';
-  const ActivePanel = PANELS[section];
 
   return (
     <section ref={wrapperRef} className="relative w-full h-[520vh] bg-[#040409]">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <Canvas
-          shadows={!isMobile}
-          dpr={isMobile ? [1, 1.5] : [1, 2]}
+          dpr={dpr}
           frameloop={inView && pageVisible ? 'always' : 'never'}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
         >
-          <PerspectiveCamera makeDefault fov={46} position={[1.5, 2.3, -1.9]} />
+          <PerformanceMonitor onIncline={() => setDpr(isMobile ? 1.5 : 2)} onDecline={degrade} onFallback={degrade} flipflops={3} />
+          <PerspectiveCamera makeDefault fov={46} position={[1.5, 2.4, -1.7]} />
           <ScrollRig progress={progress} />
-          <Scene />
+          <Scene lowQuality={lowQuality} />
           {/* Selective bloom: only HDR materials (the neon) glow */}
           <EffectComposer>
             <Bloom mipmapBlur luminanceThreshold={1} intensity={0.9} />
@@ -908,22 +710,31 @@ export function ClubScene() {
           </AnimatePresence>
         </div>
 
-        {/* Section content panels (reveal as you scroll to each section) */}
+        {/* Section content panels (reveal as you scroll to each section). All stay
+            mounted and stacked in one grid cell, so a playing mix or a half-typed
+            booking form survives scrolling to another section. */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-end p-4 sm:p-8">
-          <AnimatePresence mode="wait">
-            {ActivePanel && (
-              <motion.div
-                key={section}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 24 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="pointer-events-auto w-full max-w-md"
-              >
-                <ActivePanel />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="grid w-full max-w-md">
+            {(Object.entries(PANELS) as [SectionId, React.ComponentType][]).map(([id, Panel]) => {
+              const active = id === section;
+              return (
+                <motion.div
+                  key={id}
+                  initial={false}
+                  animate={
+                    active
+                      ? { opacity: 1, y: 0, visibility: 'visible' }
+                      : { opacity: 0, y: 24, transitionEnd: { visibility: 'hidden' } }
+                  }
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  className={`col-start-1 row-start-1 self-center ${active ? 'pointer-events-auto' : ''}`}
+                  aria-hidden={!active}
+                >
+                  <Panel />
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Scroll hint */}
