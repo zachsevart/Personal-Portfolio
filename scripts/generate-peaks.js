@@ -164,7 +164,8 @@ async function main() {
 
   for (const file of FILES) {
     try {
-      output[file] = await processFile(file);
+      // Peaks come from the WAV master; the site streams the AAC encode of it.
+      output[file.replace(/\.wav$/, '.m4a')] = await processFile(file);
     } catch (err) {
       console.error(`  ✗ Failed: ${file} — ${err.message}`);
     }

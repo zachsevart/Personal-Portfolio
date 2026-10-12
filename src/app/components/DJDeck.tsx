@@ -151,7 +151,7 @@ export function DJDeck() {
   return (
     <div
       ref={holderRef}
-      className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] xl:w-[600px] xl:h-[600px]"
+      className="w-full h-full"
     >
       <Canvas
         shadows={!isMobile}

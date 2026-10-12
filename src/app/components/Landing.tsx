@@ -1,9 +1,11 @@
+import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { BubbleBackground } from '@/components/animate-ui/components/backgrounds/bubble';
-import { DJDeck } from './DJDeck';
 import { activeColors } from '@/config/bubble-colors';
 import { ConnectList } from './ConnectList';
 import { primarySocials } from '@/content/socials';
+
+const DJDeck = lazy(() => import('./DJDeck').then((m) => ({ default: m.DJDeck })));
 
 export function Landing() {
   return (
@@ -21,8 +23,11 @@ export function Landing() {
               <h1 className="text-6xl md:text-7xl lg:text-8xl leading-tight text-white drop-shadow-lg flex-1 min-w-[300px]">
                 zachtrax
               </h1>
-              <div className="flex-shrink-0">
-                <DJDeck />
+              {/* Sized here so the slot holds its space while the 3D chunk loads */}
+              <div className="flex-shrink-0 w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] xl:w-[600px] xl:h-[600px]">
+                <Suspense fallback={null}>
+                  <DJDeck />
+                </Suspense>
               </div>
             </div>
 
