@@ -5,7 +5,8 @@ import { bookingSocials, CONTACT_EMAIL } from '@/content/socials';
 import { ConnectList } from './ConnectList';
 
 export function Booking() {
-  const { formData, submitted, handleChange, handleSubmit } = useBookingForm();
+  const { formData, submitted, submitting, error, usesEmailClient, handleChange, handleSubmit } =
+    useBookingForm();
 
   return (
     <BubbleBackground
@@ -22,10 +23,21 @@ export function Booking() {
 
         {submitted ? (
           <div className="border border-white/20 rounded-lg p-8 text-center">
-            <p className="text-white text-xl mb-2">Your email client should have opened.</p>
-            <p className="text-white/60">If it didn't, send your inquiry to{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">{CONTACT_EMAIL}</a>
-            </p>
+            {usesEmailClient ? (
+              <>
+                <p className="text-white text-xl mb-2">Your email client should have opened.</p>
+                <p className="text-white/60">If it didn't, send your inquiry to{' '}
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">{CONTACT_EMAIL}</a>
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-white text-xl mb-2">Thanks — your inquiry is on its way.</p>
+                <p className="text-white/60">I'll get back to you soon. You can also reach me at{' '}
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="text-white underline">{CONTACT_EMAIL}</a>
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -115,10 +127,17 @@ export function Booking() {
 
             <button
               type="submit"
-              className="border-2 border-white text-white px-8 py-3 text-lg hover:bg-white hover:text-black transition-colors"
+              disabled={submitting}
+              className="border-2 border-white text-white px-8 py-3 text-lg hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-white"
             >
-              Send Inquiry →
+              {submitting ? 'Sending…' : 'Send Inquiry →'}
             </button>
+            {error && (
+              <p className="text-red-400 text-sm" role="alert">
+                Couldn't send — {error}. Please email{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="underline">{CONTACT_EMAIL}</a> instead.
+              </p>
+            )}
           </form>
         )}
 

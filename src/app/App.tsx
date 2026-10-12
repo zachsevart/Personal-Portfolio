@@ -1,13 +1,16 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { Header } from './components/Header';
 import { Landing } from './components/Landing';
-import { DJMixes } from './components/DJMixes';
 import { About } from './components/About';
 import { Events } from './components/Events';
 import { Booking } from './components/Booking';
 import { ModeProvider, useMode } from './context/ModeContext';
-import { ClubApp } from './components/ClubApp';
+
+// Split out so simple-mode visitors never download three.js / wavesurfer.
+const ClubApp = lazy(() => import('./components/ClubApp').then((m) => ({ default: m.ClubApp })));
+const DJMixes = lazy(() => import('./components/DJMixes').then((m) => ({ default: m.DJMixes })));
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -22,13 +25,15 @@ function AnimatedRoutes() {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         style={{ width: '100%' }}
       >
-        <Routes location={location}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/mixes" element={<DJMixes />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes location={location}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/mixes" element={<DJMixes />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </Suspense>
       </motion.div>
     </AnimatePresence>
   );
@@ -57,7 +62,11 @@ function AppShell() {
   // Club mode takes over only the home route; the content routes (/mixes, /events,
   // /booking, /about) always render the 2D pages so they stay crawlable and shareable.
   if (mode === 'club' && location.pathname === '/') {
-    return <ClubApp />;
+    return (
+      <Suspense fallback={<div className="h-screen bg-[#040409]" />}>
+        <ClubApp />
+      </Suspense>
+    );
   }
   return <SimpleShell />;
 }

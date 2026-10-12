@@ -8,7 +8,7 @@ export const mixes: Mix[] = [
     date: '2026-08-25',
     duration: '6 min',
     description: "Remix of one of my favorite rap songs, couldn't post anywhere else because of copyright :(",
-    audioFile: 'Cdne Crzy .wav',
+    audioFile: 'Cdne Crzy .m4a',
     image: '/images/codeine-crazy.jpg',
   },
   {
@@ -17,7 +17,7 @@ export const mixes: Mix[] = [
     date: '2026-05-18',
     duration: '31 min',
     description: 'i made this at 1pm hungover on a monday',
-    audioFile: '01 REC-2026-05-18.wav',
+    audioFile: '01 REC-2026-05-18.m4a',
     image: '/images/IMG_8653.JPG',
   },
   {
@@ -26,7 +26,7 @@ export const mixes: Mix[] = [
     date: '2026-05-06',
     duration: '48 min',
     description: 'Some new stuff',
-    audioFile: '01 mix5-6-26.wav',
+    audioFile: '01 mix5-6-26.m4a',
     image: '/images/zachtraxmix-01.jpg',
   },
   {
@@ -35,7 +35,7 @@ export const mixes: Mix[] = [
     date: '2025-01-08',
     duration: '55 min',
     description: 'A mix of Deep house and pop remixes so that the people dont get upset',
-    audioFile: '01 Halloween_1outof4.wav',
+    audioFile: '01 Halloween_1outof4.m4a',
   },
   {
     id: 2,
@@ -43,7 +43,7 @@ export const mixes: Mix[] = [
     date: '2024-12-15',
     duration: '40 min',
     description: 'Some deep cuts and other stuff i liked',
-    audioFile: '01 mix006.wav',
+    audioFile: '01 mix006.m4a',
   },
   {
     id: 3,
@@ -51,7 +51,7 @@ export const mixes: Mix[] = [
     date: '2025-05-22',
     duration: '44 min',
     description: 'Random deep cuts i liked',
-    audioFile: '01 mix007.wav',
+    audioFile: '01 mix007.m4a',
   },
   {
     id: 4,
@@ -59,7 +59,7 @@ export const mixes: Mix[] = [
     date: '2025-04-29',
     duration: '32 min',
     description: "Peak time tech recorded at Lass O'Gowrie open decks",
-    audioFile: '01 mix009.wav',
+    audioFile: '01 mix009.m4a',
   },
   {
     id: 5,
@@ -67,6 +67,6 @@ export const mixes: Mix[] = [
     date: '2026-02-15',
     duration: '3 min',
     description: 'First song I have made, start to finish',
-    audioFile: 'finishedjudah3.wav',
+    audioFile: 'finishedjudah3.m4a',
   },
 ];
