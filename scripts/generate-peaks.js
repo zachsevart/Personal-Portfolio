@@ -13,7 +13,8 @@
  * Re-run whenever you add or change an audio file.
  */
 
-import { writeFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -142,15 +143,25 @@ function extractPeaks(wav) {
 
 // ── Main ─────────────────────────────────────────────────────────────
 
+// WAV masters are no longer kept on R2 (the site streams .m4a), so read the
+// master from public/audio/ when it's there and fall back to R2 otherwise.
+const LOCAL_AUDIO_DIR = join(__dirname, '..', 'public', 'audio');
+
 async function processFile(filename) {
-  const url = `${R2_BASE}/${encodeURIComponent(filename)}`;
-  console.log(`  Fetching: ${filename}...`);
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-
-  const arrayBuffer = await res.arrayBuffer();
-  console.log(`  Downloaded ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(1)} MB, decoding...`);
+  const localPath = join(LOCAL_AUDIO_DIR, filename);
+  let arrayBuffer;
+  if (existsSync(localPath)) {
+    console.log(`  Reading local: ${filename}...`);
+    const buf = await readFile(localPath);
+    arrayBuffer = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  } else {
+    const url = `${R2_BASE}/${encodeURIComponent(filename)}`;
+    console.log(`  Fetching: ${filename}...`);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url} (put the WAV in public/audio/ instead)`);
+    arrayBuffer = await res.arrayBuffer();
+  }
+  console.log(`  Loaded ${(arrayBuffer.byteLength / 1024 / 1024).toFixed(1)} MB, decoding...`);
 
   const wav = parseWav(arrayBuffer);
   const result = extractPeaks(wav);
@@ -160,7 +171,8 @@ async function processFile(filename) {
 
 async function main() {
   console.log('Generating waveform peaks...\n');
-  const output = {};
+  // Start from the existing peaks so a mix whose WAV isn't available keeps its entry.
+  const output = existsSync(OUT_PATH) ? JSON.parse(await readFile(OUT_PATH, 'utf8')) : {};
 
   for (const file of FILES) {
     try {
